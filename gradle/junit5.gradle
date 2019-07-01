@@ -1,0 +1,59 @@
+ext {
+    jupiter_version='5.5.0-RC2'
+    alter_version='1.5.0-RC2'
+}
+
+dependencies {
+
+    /*implementation group: 'org.junit.jupiter', name: 'junit-jupiter-migrationsupport', version: "${jupiter_version}"
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${jupiter_version}"
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: "${jupiter_version}"
+    implementation group: 'org.junit.platform', name: 'junit-platform-console', version: "${alter_version}"
+    implementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${alter_version}"
+    implementation group: 'org.junit.platform', name: 'junit-platform-runner', version: "${alter_version}"
+    implementation group: 'org.junit.platform', name: 'junit-platform-commons', version: "${alter_version}"*/
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${jupiter_version}"
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-migrationsupport', version: "${jupiter_version}"
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${jupiter_version}"
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: "${jupiter_version}"
+    testImplementation group: 'org.junit.platform', name: 'junit-platform-console', version: "${alter_version}"
+    testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${alter_version}"
+    testImplementation group: 'org.junit.platform', name: 'junit-platform-runner', version: "${alter_version}"
+
+}
+
+
+test {
+
+    description = 'Executa testes. Para executar tags específicas, use: gradle clean test -Dtag="tag".'
+
+    String tag = System.properties.getProperty("tag")
+    systemProperties = [
+            'junit.jupiter.extensions.autodetection.enabled': 'true',
+            'junit.jupiter.testinstance.lifecycle.default': 'per_class'
+    ]
+
+    useJUnitPlatform() {
+
+        if(null != tag && !tag.equalsIgnoreCase("")) includeTags String.valueOf(tag)
+    }
+
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: ${descriptor}")
+    }
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "\nTest result: ${result.resultType}"
+            println "Test summary: ${result.testCount} tests, " +
+                    "${result.successfulTestCount} succeeded, " +
+                    "${result.failedTestCount} failed, " +
+                    "${result.skippedTestCount} skipped"
+        }
+    }
+
+}
