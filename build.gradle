@@ -12,7 +12,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
-    maven { url "http://dl.bintray.com/epam/reportportal" }
     maven { url "https://jitpack.io" }
 }
 
@@ -24,11 +23,6 @@ ext {
     alter_version='1.4.0'
 }
 
-configurations {
-    exclusions {
-        exclude group: 'org.junit'
-    }
-}
 configurations {
     exclusions {
         exclude group: 'org.junit'

@@ -11,6 +11,10 @@ public interface TestUtils {
 
     Supplier<String> configFile = () -> "src/test/resources/modelo.conf";
 
+    Supplier<String> baseURL = () -> "http://www.google.com";
+
+    Supplier<Map<String,Object>> headers = () -> Map.of("Content-Type", "application/json");
+
     BiPredicate<List<String>, List<String>> equalsList = (list, list2) ->
             list2.containsAll(list);
 
