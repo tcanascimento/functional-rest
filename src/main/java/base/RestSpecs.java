@@ -55,7 +55,7 @@ public class RestSpecs implements BaseUtils {
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setQueryParams(tempEndpoint, queryParams);
         if(getRawEndpoint() != null) setURI(baseUrl, tempEndpoint); else this.uri = URI.create(baseUrl);
-        if(body != null && !body.isBlank()) setBody(body);
+        if(body != null) setBody(body);
     }
 
     private void setURI(String baseURL, String endpoint){
