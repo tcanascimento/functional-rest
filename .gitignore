@@ -3,3 +3,4 @@ build
 .idea/
 src/main/java/test/
 src/main/resources/
+out/

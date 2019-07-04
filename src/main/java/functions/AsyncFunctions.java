@@ -9,22 +9,21 @@ import base.RestSpecs;
 import io.vavr.control.Try;
 
 import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 
 public interface AsyncFunctions extends HttpFunctions {
 
-    //todo: substituir throws por modelo: Try.run(() -> {throw new ProtocolException("request error");}).andFinallyTry(()-> con.setRequestMethod("GET"));
     //InterruptedException, ExecutionException
 
-    Function<RestSpecs, HttpResponse> asyncRequestGET = specs ->
-            (HttpResponse) Try.of(() ->
+    Function<RestSpecs, HttpResponse> asyncRequestGET = specs -> (HttpResponse)
+        Try.of(() ->
                     specs.getBaseClient().sendAsync(
                             requestGET.apply(specs),
                             specs.getResponseBodyHandler()
                     ).get()
             ).getOrNull();
-
 
     Function<RestSpecs, HttpResponse> asyncRequestDELETE = specs ->
 
@@ -51,4 +50,6 @@ public interface AsyncFunctions extends HttpFunctions {
                                     specs.getResponseBodyHandler()
                             ).get()
                     ).getOrNull();
+
+    //Try.run(() -> {throw new ProtocolException("request error");}).andFinallyTry(()-> con.setRequestMethod("GET"));/**/
 }

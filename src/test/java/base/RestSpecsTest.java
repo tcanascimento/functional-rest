@@ -27,8 +27,6 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
                     $.headersParams = headers.get();
                 }).createSpecs();
 
-//        var response = syncRequestGET.apply(specs2);
-
         assertAll("Just BaseURL and Headers from Builder",
                 () -> assertNotNull(specs2),
                 () -> assertTrue(specs2.getURI().toString().equalsIgnoreCase(baseURL.get())),
