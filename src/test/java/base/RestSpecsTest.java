@@ -1,16 +1,26 @@
 package base;
 
+import cyclops.control.Either;
+import cyclops.control.Option;
+import cyclops.control.Try;
 import functions.AsyncFunctions;
 import functions.BaseUtils;
 import functions.HttpFunctions;
 import functions.SyncFunctions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import utils.TestUtils;
 
-import java.util.Map;
-import java.util.function.Supplier;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,7 +67,7 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
 
     @Tag("specs-simple")
     @Test
-    void specsConstructorSimpleTest(){
+    void specsConstructorSimpleTest() throws ExecutionException, InterruptedException {
 
         var specs = new RestSpecs(baseURL.get(), headers.get(), "");
 
@@ -68,5 +78,27 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
                 () -> assertNotNull(specs.getBaseClient(), "BaseClient cannot be null!"),
                 () -> assertNotNull(specs.getURI(), "URI cannot be null!")
         );
+
+//        System.out.println(asyncRequestGET.apply(specs).body());
+
+//        var response = syncRequestGET.apply(specs).get();
+        /*var body = response.peek(HttpResponse::body);
+        Option<Object> status = response.map(HttpResponse::statusCode);*
+
+        /*System.out.println(body);
+        System.out.println(status);*/
+
+        var response = algo.apply(specs);
+        System.out.println(response.thenApply(HttpResponse::body).get());
     }
+
+    /*Function<RestSpecs, Either<Exception, HttpResponse>> syncRequestGET = specs ->
+            cyclops.control.Try.withCatch(
+                    () -> specs.getBaseClient().send(requestGET.apply(specs),
+                            specs.getResponseBodyHandler()), IOException.class
+            ).toEither();*/
+
+    Function<RestSpecs, CompletableFuture<HttpResponse>> algo = specs ->
+            specs.getBaseClient().sendAsync(requestGET.apply(specs), specs.getResponseBodyHandler());
+
 }

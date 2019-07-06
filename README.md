@@ -38,12 +38,9 @@ Um teste fazendo uso dessa função tem o seguinte formato:
        
        assertAll("valida dia feliz",
              () -> assertNotNull(response.get()),
-             () -> assertNotNull(response.get().headers().firstValue("x-access-token"))
-             );
+             () -> assertNotNull(response.get().headers().firstValue("x-access-token")));
     }
 </code></pre>
-
-Também foi inserido um modelo de validação de Objetos por construção com <a href="https://www.baeldung.com/javax-validation">Javax Validation</a>.
 
 <p>Para executar testes com uma <i>tag</i> específica, por exemplo 'auth', execute via terminal: <code>gradle clean test -Dtag="auth"</code>. </p>
 <p>Consulte a <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-tagging-and-filtering">documentação oficial do Junit5</a> para maiores informações.</p> 
