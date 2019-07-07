@@ -9,7 +9,7 @@
 Foram implementados duas interfaces: 
 - uma conjunto de Funções para Request Assíncronos com assinatura:
  
-```
+```java
 Function<RestSpecs, HttpResponse> asyncRequestGET = (specs) ->
              (HttpResponse) Try.of(() ->
                      specs.getBaseClient().sendAsync(
