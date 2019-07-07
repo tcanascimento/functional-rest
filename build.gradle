@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "eu.davidea:grabver:2.0.1"
+    }
+}
+
 plugins {
     id 'java'
 }
@@ -13,11 +22,14 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url "https://jitpack.io" }
+    maven { url "http://dl.bintray.com/davideas/maven" }
+    maven { url "https://plugins.gradle.org/m2/" }
 }
 
 apply from: 'gradle/vavr.gradle'
 apply from: 'gradle/junit5.gradle'
 apply from: 'gradle/cyclops.gradle'
+apply plugin: "eu.davidea.grabver"
 
 configurations {
     exclusions {
@@ -60,4 +72,17 @@ test {
                     "${result.skippedTestCount} skipped"
         }
     }
+}
+
+versioning {
+    versioning.major
+    version = versioning.name
+    major 1
+    minor 0
+    patch 7
+    preRelease "RC1"
+    // Optional, custom task name to trigger the increase of the version
+//    incrementOn "addVersion"
+    // Optional, custom task name for which you want to save the versioning file
+//    saveOn "saveVersion"
 }
