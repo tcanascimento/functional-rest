@@ -1,8 +1,5 @@
 package base;
 
-import cyclops.control.Either;
-import cyclops.control.Option;
-import cyclops.control.Try;
 import functions.AsyncFunctions;
 import functions.BaseUtils;
 import functions.HttpFunctions;
@@ -11,16 +8,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import utils.TestUtils;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 

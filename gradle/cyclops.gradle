@@ -1,0 +1,13 @@
+ext {
+    alter_version='10.0.0-M7'
+    cyclops_version = '10.3.2'
+}
+
+dependencies {
+    implementation group: 'com.oath.cyclops', name: 'cyclops-vavr-integration', version: "${alter_version}"
+    implementation group: 'com.oath.cyclops', name: 'cyclops-reactive-collections', version: "${cyclops_version}"
+    implementation group: 'com.oath.cyclops', name: 'cyclops-reactor-integration', version: "${cyclops_version}"
+    implementation group: 'com.oath.cyclops', name: 'cyclops-pure', version: "${cyclops_version}"
+    implementation group: 'com.oath.cyclops', name: 'cyclops-anym', version: "${cyclops_version}"
+    testImplementation group: 'com.oath.cyclops', name: 'cyclops-futurestream', version: "${cyclops_version}"
+}

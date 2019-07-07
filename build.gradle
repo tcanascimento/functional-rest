@@ -17,11 +17,7 @@ repositories {
 
 apply from: 'gradle/vavr.gradle'
 apply from: 'gradle/junit5.gradle'
-
-ext {
-    jupiter_version='5.4.0'
-    alter_version='1.4.0'
-}
+apply from: 'gradle/cyclops.gradle'
 
 configurations {
     exclusions {
@@ -30,14 +26,7 @@ configurations {
 }
 
 dependencies {
-    implementation(group: 'com.github.pureconfig', name: 'pureconfig-javax_2.12', version: '0.10.2')
-    implementation group: 'com.oath.cyclops', name: 'cyclops-vavr-integration', version: '10.0.0-M7'
-    implementation group: 'com.oath.cyclops', name: 'cyclops-reactive-collections', version: '10.3.2'
-    implementation group: 'com.oath.cyclops', name: 'cyclops-reactor-integration', version: '10.3.2'
-    implementation group: 'com.oath.cyclops', name: 'cyclops-pure', version: '10.3.2'
-    implementation group: 'com.oath.cyclops', name: 'cyclops-anym', version: '10.3.2'
-    testImplementation group: 'com.oath.cyclops', name: 'cyclops-futurestream', version: '10.3.2'
-
+    implementation group: 'com.github.pureconfig', name:'pureconfig-javax_2.12', version: '0.10.2'
 }
 
 test {
