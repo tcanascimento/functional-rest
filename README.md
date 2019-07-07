@@ -4,6 +4,8 @@
 
 @License: Apache 2
 
+[![CircleCI](https://circleci.com/gh/tcanascimento/functional-rest/tree/master.svg?style=svg)](https://circleci.com/gh/tcanascimento/functional-rest/tree/master)
+
 Foram implementados duas interfaces: 
 - uma conjunto de Funções para Request Assíncronos com assinatura: 
 <pre><code>
