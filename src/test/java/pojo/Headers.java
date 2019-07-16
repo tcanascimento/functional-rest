@@ -13,6 +13,8 @@ public class Headers {
     private String mHost;
     @JsonProperty("User-Agent")
     private String mUserAgent;
+    @JsonProperty("Content-Length")
+    private String contentLength;
 
     public Headers(){}
 

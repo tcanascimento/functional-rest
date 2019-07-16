@@ -13,6 +13,14 @@ public class Body {
     private String mOrigin;
     @JsonProperty("url")
     private String mUrl;
+    @JsonProperty("data")
+    private String data;
+    @JsonProperty("form")
+    private Form form;
+    @JsonProperty("json")
+    private String json;
+    @JsonProperty
+    private Files files;
 
     public Body() {
     }
