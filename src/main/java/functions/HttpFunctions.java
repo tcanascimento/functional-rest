@@ -48,8 +48,9 @@ public interface HttpFunctions {
                     .headers(specs.getHeaders())
                     .PUT(specs.getBody()).build();
 
-    //todo: criar exception personalizada
     BiFunction<HttpResponse, Class, Object> responseToClass = (response, clazz) ->
             Try.of(() -> new ObjectMapper().readValue(response.body().toString(), clazz)).getOrNull();
 
+    BiFunction<String, Class, Object> responseBodyToClass = (body, clazz) ->
+            Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrNull();
 }
