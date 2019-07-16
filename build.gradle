@@ -26,9 +26,9 @@ repositories {
     maven { url "https://plugins.gradle.org/m2/" }
 }
 
-apply from: 'gradle/vavr.gradle'
+//apply from: 'gradle/vavr.gradle'
 apply from: 'gradle/junit5.gradle'
-apply from: 'gradle/cyclops.gradle'
+apply from: 'gradle/vavr.gradle'
 apply plugin: "eu.davidea.grabver"
 
 configurations {
@@ -39,39 +39,7 @@ configurations {
 
 dependencies {
     implementation group: 'com.github.pureconfig', name:'pureconfig-javax_2.12', version: '0.10.2'
-}
-
-test {
-
-    description = 'Executa testes. Para executar tags específicas, use: gradle clean test -Dtag="tag".'
-
-    String tag = System.properties.getProperty("tag")
-    systemProperties = [
-            'junit.jupiter.extensions.autodetection.enabled': 'true',
-            'junit.jupiter.testinstance.lifecycle.default': 'per_class'
-    ]
-
-    useJUnitPlatform() {
-
-        if(null != tag && !tag.equalsIgnoreCase("")) includeTags String.valueOf(tag)
-    }
-
-    testLogging {
-        events 'PASSED', 'FAILED', 'SKIPPED'
-    }
-
-    beforeTest { descriptor ->
-        logger.lifecycle("Running test: ${descriptor}")
-    }
-    afterSuite { desc, result ->
-        if (!desc.parent) {
-            println "\nTest result: ${result.resultType}"
-            println "Test summary: ${result.testCount} tests, " +
-                    "${result.successfulTestCount} succeeded, " +
-                    "${result.failedTestCount} failed, " +
-                    "${result.skippedTestCount} skipped"
-        }
-    }
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
 }
 
 versioning {

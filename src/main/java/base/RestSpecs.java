@@ -41,7 +41,7 @@ public class RestSpecs implements BaseUtils {
         this.baseUrl = URI.create(baseUrl);
         this.uri = URI.create(baseUrl);
         this.headers = headersParams;
-        if(body != null) setBody(body);
+        if(body != null) setBody(body); else setBody("");
     }
 
     public RestSpecs(String baseUrl, String endp, Map<String, Object> headersParams, Map<String, Object> queryParams,
@@ -55,7 +55,7 @@ public class RestSpecs implements BaseUtils {
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setQueryParams(tempEndpoint, queryParams);
         if(getRawEndpoint() != null) setURI(baseUrl, tempEndpoint); else this.uri = URI.create(baseUrl);
-        if(body != null) setBody(body);
+        if(body != null) setBody(body); else setBody("");
     }
 
     private void setURI(String baseURL, String endpoint){
@@ -83,8 +83,9 @@ public class RestSpecs implements BaseUtils {
         this.responseHandlerType = responseHandlerType;
     }
 
+    //todo: test it!
     public void setBaseUrl(String baseUrl) {
-        assert(assertStringNotNull.negate().test(baseUrl)): MESSAGE.get();
+        assert baseUrl.isBlank(): "baseURL cannot be empty!";
         this.baseUrl = URI.create(baseUrl);
     }
 

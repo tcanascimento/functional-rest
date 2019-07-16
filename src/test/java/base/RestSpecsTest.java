@@ -4,6 +4,7 @@ import functions.AsyncFunctions;
 import functions.BaseUtils;
 import functions.HttpFunctions;
 import functions.SyncFunctions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import utils.TestUtils;
@@ -26,6 +27,7 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
                 ($) -> {
                     $.baseUrl2 = baseURL.get();
                     $.headersParams = headers.get();
+                    $.bodyString = "";
                 }).createSpecs();
 
         assertAll("Just BaseURL and Headers from Builder",
@@ -79,17 +81,34 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
         /*System.out.println(body);
         System.out.println(status);*/
 
-        var response = algo.apply(specs);
-        System.out.println(response.thenApply(HttpResponse::body).get());
+        var response = asyncRequestGET.apply(specs);
+
+        System.out.println("Status Code: "+ response.thenApply(HttpResponse::statusCode).get());
+        System.out.println("Body: " + response.get().body());
+        System.out.println("Headers: " + response.get().headers());
+
+        System.out.println("\nHttpResponse: " + response.get());
+
     }
 
-    /*Function<RestSpecs, Either<Exception, HttpResponse>> syncRequestGET = specs ->
-            cyclops.control.Try.withCatch(
-                    () -> specs.getBaseClient().send(requestGET.apply(specs),
-                            specs.getResponseBodyHandler()), IOException.class
-            ).toEither();*/
 
-    Function<RestSpecs, CompletableFuture<HttpResponse>> algo = specs ->
-            specs.getBaseClient().sendAsync(requestGET.apply(specs), specs.getResponseBodyHandler());
+    @Disabled
+    @Test
+    void nada(){
+//        var url = "http://localhost:8080/uat/sso/oauth/token?grant_type=password&username=superadmin&password=erebus";
+
+        var url = "http://www.google.com";
+
+        var specs2 = new RestSpecsBuilder().with(
+                ($) -> {
+                    $.baseUrl2 = url;
+                    $.headersParams = headers.get();
+                }).createSpecs();
+
+        var response = syncRequestPost.apply(specs2);
+
+        System.out.println(response.body());
+
+    }
 
 }

@@ -1,0 +1,6 @@
+endpoint,statusCode
+/get,200
+/patch,200
+/post,200
+/put,200
+/delete,200

@@ -21,6 +21,8 @@ dependencies {
     testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${alter_version}"
     testImplementation group: 'org.junit.platform', name: 'junit-platform-runner', version: "${alter_version}"
 
+//    testImplementation "org.testcontainers:junit-jupiter:1.11.3"
+
 }
 
 

@@ -16,14 +16,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public interface BaseUtils {
-
-    Predicate<String> assertStringNotNull = e -> e.replaceAll("\\s+","").isEmpty();
-    Supplier<String> MESSAGE = () -> "baseUrl can not be empty!";
 
     /**
      * Funciona bem para objetos POJO -Não foi configurado para funcionar com RestSpecs.
@@ -48,7 +43,7 @@ public interface BaseUtils {
     };
 
 
-    //vergonhoso esse 'regex'!
+    //todo: shame on you!
     BiFunction<String,Map<String,Object>, String> setPathParameters = (endpoint, pars) -> {
         AtomicReference<String> temp = new AtomicReference<>(endpoint);
         pars.keySet().forEach(
@@ -57,11 +52,12 @@ public interface BaseUtils {
     };
 
 
-    //terrible man!
+    //todo: terrible man!
     Function<Map<String,Object>, String[]> mapToStringArray = map -> {
+
         Iterator<Map.Entry<String,Object>> iter = map.entrySet().iterator();
 
-        if(! iter.hasNext()) return new String[0];
+        if(!iter.hasNext()) return new String[0];
         List<String> composition = new ArrayList<>();
         //isso poderia fazer com que um array ímpar fosse validado, porém, a interface Map do Java não permite criar Map com tamanho ímpar
         String[] lista = new String[(map.size() * 2)];
