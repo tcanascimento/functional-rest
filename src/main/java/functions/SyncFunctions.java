@@ -15,7 +15,8 @@ public interface SyncFunctions extends HttpFunctions {
 
     Function<RestSpecs, HttpResponse> syncRequestGET = specs ->
             Try.of(() -> specs.getBaseClient().send(requestGET.apply(specs),
-                            specs.getResponseBodyHandler())).getOrNull();
+                            specs.getResponseBodyHandler()))
+                    .getOrNull();
 
     Function<RestSpecs, HttpResponse> syncRequestDELETE = specs ->
             Try.of(() -> specs.getBaseClient().send(requestDELETE.apply(specs),
