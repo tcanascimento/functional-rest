@@ -53,3 +53,4 @@ void testFunction(){
 <p>Para executar testes com uma <i>tag</i> específica, por exemplo 'auth', execute via terminal: <code>gradle clean test -Dtag="auth"</code>. </p>
 <p>Consulte a <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-tagging-and-filtering">documentação oficial do Junit5</a> para maiores informações.</p> 
 
+<p><a href="https://tcanascimento.github.io/functional-rest/">GitHub Page</a></p>
