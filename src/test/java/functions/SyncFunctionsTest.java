@@ -21,8 +21,8 @@ class SyncFunctionsTest implements SyncFunctions, BaseUtils, MessageSupplier, Te
 
     private Supplier<String> config_sync =  () -> "src/test/resources/sync-get.conf";
 
-//    private Supplier<String> httpURL = () -> "https://httpbin.org";
-    private Supplier<String> httpURL = () -> "http://localhost:8080";
+    private Supplier<String> httpURL = () -> "https://httpbin.org";
+//    private Supplier<String> httpURL = () -> "http://localhost:8080";
 
     @Tags({@Tag("sync")})
     @DisplayName(value = "Sync Http")

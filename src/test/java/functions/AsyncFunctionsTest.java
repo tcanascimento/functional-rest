@@ -25,8 +25,8 @@ class AsyncFunctionsTest implements AsyncFunctions, BaseUtils, MessageSupplier, 
 
     private Supplier<String> configSync =  () -> "src/test/resources/sync-get.conf";
 
-    //    private Supplier<String> httpURL = () -> "https://httpbin.org";
-    private Supplier<String> httpURL = () -> "http://localhost:8080"; //o objeto de retorno no docker é diferente do Http
+        private Supplier<String> httpURL = () -> "https://httpbin.org";
+//    private Supplier<String> httpURL = () -> "http://localhost:8080"; //o objeto de retorno no docker é diferente do Http
 
 
     @Tags({@Tag("sync")})
