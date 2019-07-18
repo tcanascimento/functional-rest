@@ -18,6 +18,7 @@ import utils.TestUtils;
 
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assumptions.assumingThat;
 
 class SampleTest implements SyncFunctions, AsyncFunctions, BaseUtils, MessageSupplier, TestUtils {
 
-    Supplier<String> barURL = () -> "http://localhost";
+    Supplier<String> barURL = () -> "https://httpbin.org";
     Supplier<Map<String, Object>> headers = () -> Map.of("Content-Type", "application/json");
     Supplier<String> configSync =  () -> "src/test/resources/sync-get.conf";
 
