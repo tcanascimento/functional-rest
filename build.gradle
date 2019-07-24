@@ -1,0 +1,80 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "eu.davidea:grabver:2.0.1"
+//        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
+    }
+}
+
+plugins {
+    id 'java'
+    id "org.sonarqube" version "2.7"
+    id 'jacoco'
+}
+
+group 'tcanascimento'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven { url "https://jitpack.io" }
+    maven { url "http://dl.bintray.com/davideas/maven" }
+    maven { url "https://plugins.gradle.org/m2/" }
+}
+
+//apply from: 'gradle/vavr.gradle'
+apply from: 'gradle/junit5.gradle'
+apply from: 'gradle/vavr.gradle'
+apply plugin: "eu.davidea.grabver"
+
+configurations {
+    exclusions {
+        exclude group: 'org.junit'
+    }
+}
+
+dependencies {
+    implementation group: 'com.github.pureconfig', name:'pureconfig-javax_2.12', version: '0.10.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+    implementation 'com.github.jitpack:gradle-simple:1.0'
+}
+
+versioning {
+    versioning.major
+    version = versioning.name
+    major 1
+    minor 0
+    patch 7
+    preRelease "RC1"
+    // Optional, custom task name to trigger the increase of the version
+//    incrementOn "addVersion"
+    // Optional, custom task name for which you want to save the versioning file
+//    saveOn "saveVersion"
+}
+
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.projectName", "${project.name}"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", "049828c45cd25354ef4b8047cc2065da77a117c1"
+        property "sonar.projectKey", "69e20ec8f64ee4217184606bd0fd989e90890b12"
+        property "sonar.projectKey", "tcanascimento_functional-rest"
+        property "sonar.organization","tcanascimento-github"
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
