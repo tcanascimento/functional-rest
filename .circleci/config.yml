@@ -10,6 +10,8 @@ jobs:
           keys:
             - gradle-{{ checksum "build.gradle" }}
       - run: gradle clean test
+      - run: gradle jacocoTestReport
+      - run: gradle sonarqube
       - run: gradle assemble
       - save_cache:
           paths:
