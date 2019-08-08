@@ -58,9 +58,9 @@ versioning {
     patch 7
     preRelease "RC1"
     // Optional, custom task name to trigger the increase of the version
-//    incrementOn "addVersion"
+    incrementOn "assemble"
     // Optional, custom task name for which you want to save the versioning file
-//    saveOn "saveVersion"
+    saveOn "assemble"
 }
 
 sonarqube {
