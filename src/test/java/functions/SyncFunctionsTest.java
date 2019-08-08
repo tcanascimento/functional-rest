@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assumptions.assumingThat;
 class SyncFunctionsTest implements SyncFunctions, BaseUtils, MessageSupplier, TestUtils {
 
     private Supplier<String> config_sync =  () -> "src/test/resources/sync-get.conf";
-
     private Supplier<String> httpURL = () -> "https://httpbin.org";
 //    private Supplier<String> httpURL = () -> "http://localhost:8080";
 

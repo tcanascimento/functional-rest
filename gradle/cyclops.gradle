@@ -1,6 +1,6 @@
 ext {
     alter_version='10.0.0-M7'
-    cyclops_version = '10.3.2'
+    cyclops_version = '10.3.3'
 }
 
 dependencies {

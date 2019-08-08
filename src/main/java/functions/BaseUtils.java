@@ -28,7 +28,7 @@ public interface BaseUtils {
                     ConfigFactory.parseFile(new File(file)).resolve().getConfig("specs"),
                     clazz);
 
-    Function<String, RestSpecs> specsFromFile = (file) -> {
+    Function<String, RestSpecs> specsFromFile = file -> {
         Config config = ConfigFactory.parseFile(new File(file)).resolve();
         return new RestSpecsBuilder().with(
                 ($) -> {
@@ -59,7 +59,6 @@ public interface BaseUtils {
 
         if(!iter.hasNext()) return new String[0];
         List<String> composition = new ArrayList<>();
-        //isso poderia fazer com que um array ímpar fosse validado, porém, a interface Map do Java não permite criar Map com tamanho ímpar
         String[] lista = new String[(map.size() * 2)];
 
         while (iter.hasNext()){
@@ -67,9 +66,7 @@ public interface BaseUtils {
             String key = temp.getKey();
             String value = String.valueOf(temp.getValue());
             composition.add(key);
-//            composition.add(",");
             composition.add(value);
-//            if(iter.hasNext()) composition.add(",");
         }
 
         for(int i = 0; i < composition.size(); i++){

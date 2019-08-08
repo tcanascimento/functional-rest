@@ -6,7 +6,7 @@ buildscript {
     dependencies {
         classpath "eu.davidea:grabver:2.0.1"
 //        classpath 'com.bmuschko:gradle-clover-plugin:2.2.3'
-//        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
     }
 }
 
@@ -31,9 +31,9 @@ repositories {
     maven { url "https://plugins.gradle.org/m2/" }
 }
 
-//apply from: 'gradle/vavr.gradle'
 apply from: 'gradle/junit5.gradle'
 apply from: 'gradle/vavr.gradle'
+apply from: 'gradle/cyclops.gradle'
 apply plugin: "eu.davidea.grabver"
 //apply plugin: 'com.bmuschko.clover'
 
@@ -69,20 +69,21 @@ sonarqube {
         property "sonar.projectName", "${project.name}"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.login", "049828c45cd25354ef4b8047cc2065da77a117c1"
-        property "sonar.projectKey", "69e20ec8f64ee4217184606bd0fd989e90890b12"
+//        property "sonar.projectKey", "69e20ec8f64ee4217184606bd0fd989e90890b12"
         property "sonar.projectKey", "tcanascimento_functional-rest"
         property "sonar.organization","tcanascimento-github"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${buid.Dir}/jacoco"
+        property "sonar.junit.reportPaths", "${buildDir}/test-results/test"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 
-/*jacocoTestReport {
+jacocoTestReport {
     reports {
-        xml.enabled false
-        csv.enabled false
+        xml.enabled true
+        csv.enabled true
         html.destination file("${buildDir}/jacocoHtml")
     }
-}*/
+}
 
 //clover {
 //    excludes = ['**/SynchronizedMultiValueMap.java']

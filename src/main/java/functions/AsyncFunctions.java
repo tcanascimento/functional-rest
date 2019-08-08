@@ -14,9 +14,6 @@ import java.util.function.Function;
 
 public interface AsyncFunctions extends HttpFunctions {
 
-    //InterruptedException, ExecutionException
-    //Try.run(() -> {throw new ProtocolException("request error");}).andFinallyTry(()-> con.setRequestMethod("GET"));/**/
-
     Function<RestSpecs, CompletableFuture<HttpResponse>> asyncRequestGET = specs ->
                     specs.getBaseClient().sendAsync(requestGET.apply(specs),
                             specs.getResponseBodyHandler());

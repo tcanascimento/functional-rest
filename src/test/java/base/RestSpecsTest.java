@@ -4,7 +4,6 @@ import functions.AsyncFunctions;
 import functions.BaseUtils;
 import functions.HttpFunctions;
 import functions.SyncFunctions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import utils.TestUtils;
@@ -22,7 +21,7 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
     void specsBuilderWithTwoParametersTest(){
 
         var specs2 = new RestSpecsBuilder().with(
-                ($) -> {
+                $ -> {
                     $.baseUrl2 = baseURL.get();
                     $.headersParams = headers.get();
                     $.bodyString = "";
@@ -70,15 +69,6 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
                 () -> assertNotNull(specs.getURI(), "URI cannot be null!")
         );
 
-//        System.out.println(asyncRequestGET.apply(specs).body());
-
-//        var response = syncRequestGET.apply(specs).get();
-        /*var body = response.peek(HttpResponse::body);
-        Option<Object> status = response.map(HttpResponse::statusCode);*
-
-        /*System.out.println(body);
-        System.out.println(status);*/
-
         var response = asyncRequestGET.apply(specs);
 
         System.out.println("Status Code: "+ response.thenApply(HttpResponse::statusCode).get());
@@ -86,26 +76,6 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
         System.out.println("Headers: " + response.get().headers());
 
         System.out.println("\nHttpResponse: " + response.get());
-
-    }
-
-
-    @Disabled
-    @Test
-    void nada(){
-//        var url = "http://localhost:8080/uat/sso/oauth/token?grant_type=password&username=superadmin&password=erebus";
-
-        var url = "http://www.google.com";
-
-        var specs2 = new RestSpecsBuilder().with(
-                ($) -> {
-                    $.baseUrl2 = url;
-                    $.headersParams = headers.get();
-                }).createSpecs();
-
-        var response = syncRequestPost.apply(specs2);
-
-        System.out.println(response.body());
 
     }
 

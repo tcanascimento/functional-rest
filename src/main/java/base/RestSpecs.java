@@ -83,7 +83,6 @@ public class RestSpecs implements BaseUtils {
         this.responseHandlerType = responseHandlerType;
     }
 
-    //todo: test it!
     public void setBaseUrl(String baseUrl) {
         assert baseUrl.isBlank(): "baseURL cannot be empty!";
         this.baseUrl = URI.create(baseUrl);
@@ -182,8 +181,7 @@ public class RestSpecs implements BaseUtils {
     }
 
     public String getFormatedEndpoint(){
-        var tempEndpoint = this.endpoint;
-        tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
+        var tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         tempEndpoint = setQueryParams(tempEndpoint, queryParams);
         return tempEndpoint;
     }
@@ -193,7 +191,7 @@ public class RestSpecs implements BaseUtils {
     }
 
     private String setPathParams(Map<String, Object> pathParams, String endpoint) {
-        this.pathParams = pathParams; //todo: testar com null
+        this.pathParams = pathParams;
         return (pathParams != null && pathParams.size() % 2 == 0) ? setPathParameters.apply(endpoint, pathParams) : endpoint;
     }
 
@@ -208,7 +206,7 @@ public class RestSpecs implements BaseUtils {
      * @return
      */
     private String setQueryParams(String endpoint, Map<String, Object> queryParams){
-        this.queryParams = queryParams; //todo: testar com null
+        this.queryParams = queryParams;
         return (queryParams == null || queryParams.size() < 2) ? endpoint : queryParametersComposition.apply(endpoint, queryParams);
     }
 

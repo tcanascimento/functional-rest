@@ -23,8 +23,7 @@ import static org.junit.jupiter.api.Assumptions.assumingThat;
 class AsyncFunctionsTest implements AsyncFunctions, BaseUtils, MessageSupplier, TestUtils {
 
     private Supplier<String> configSync =  () -> "src/test/resources/sync-get.conf";
-
-        private Supplier<String> httpURL = () -> "https://httpbin.org";
+    private Supplier<String> httpURL = () -> "https://httpbin.org";
 //    private Supplier<String> httpURL = () -> "http://localhost:8080"; //o objeto de retorno no docker é diferente do Http
 
 

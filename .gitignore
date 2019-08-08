@@ -2,3 +2,7 @@
 build
 .idea/
 out/
+.classpath
+.project
+rest-functions.iml
+.settings
