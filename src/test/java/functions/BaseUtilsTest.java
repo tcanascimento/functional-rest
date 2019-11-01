@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BaseUtilsTest implements BaseUtils, TestUtils {
 
     private Supplier<String> baseURL = () -> "https://www.gateway-empresa.com";
-    private Supplier<String> endpoint = () -> "/relatorios/{cnpj}/razao/lancamento/{conta}/";
+    private Supplier<String> endpoint = () -> "/relatorios/{cnpj}/razao/lancamento/{conta}";
     private Map<String, Object> headers = Map.of("Content-Type", "application/x-www-form-urlencoded", "client_id", "CLIENTE_ID", "access_token", "QzBOdMOhQjFsLUMwcjMtQjRDay1UMGszbgo=");
     private Map<String, Object> queryPars = Map.of( "mesInicial", 1, "ano", 2019,"mesFinal", 12);
     private Map<String, Object> pathPars =  Map.of("cnpj","23494210000137", "conta", "2.01.01.01.03");
@@ -28,6 +28,7 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
         var specs = specsFromFile.apply(configFile.get());
 
         var formatedEndpoint = queryParametersComposition.apply(setPathParameters.apply(endpoint.get(), pathPars), queryPars);
+        System.out.println(formatedEndpoint);
 
         assertAll(
                 () -> assertNotNull(specs, "Erro ao carregar arquivo!"),
@@ -45,7 +46,7 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
     void pathParametersTest(){
 
         var formatedPath = setPathParameters.apply(endpoint.get(), pathPars);
-        var expected = "/relatorios/23494210000137/razao/lancamento/2.01.01.01.03/";
+        var expected = "/relatorios/23494210000137/razao/lancamento/2.01.01.01.03";
 
         assertAll(
                 () -> assertNotNull(formatedPath, "Erro ao construir objeto"),
@@ -66,13 +67,27 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
 
     }
 
+    @Tag("empty-array")
+    @Test
+    void mapToStringEmptyArrayTest(){
+        Map<String, Object> basePars = Map.of();
+        String[] expected = {};
+        var res = mapToStringArray.apply(basePars);
+
+        assertAll(
+                () -> assertNotNull(res, "Objeto não pode ser nulo"),
+                () -> assertEquals(expected.length, res.length, "Arrays diferentes em conteúdo"),
+                () -> assertTrue(equalsList.test(Arrays.asList(expected), Arrays.asList(res)), "Conteúdo deve ser o mesmo"));
+
+    }
+
 
     @Tag("query")
     @Test
     void queryParsCompositionTest(){
 
         var res = queryParametersComposition.apply(endpoint.get(), queryPars);
-
+        System.out.println(res);
         assertAll(
                 () -> assertNotNull(res, "Objeto não pode ser nulo"),
                 () -> assertTrue(res.length() >= endpoint.get().length(), "Arrays diferentes em conteúdo"),

@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class RestSpecs implements BaseUtils {
+public final class RestSpecs implements BaseUtils {
 
     private static final Logger LOG = Logger.getLogger(RestSpecs.class.getName());
 

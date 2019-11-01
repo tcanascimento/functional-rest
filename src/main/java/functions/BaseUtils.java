@@ -14,9 +14,11 @@ import com.typesafe.config.ConfigFactory;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public interface BaseUtils {
 
@@ -38,42 +40,27 @@ public interface BaseUtils {
                     $.queryParams = config.getConfig("specs").getObject("queryParams").unwrapped();
                     $.pathParams = config.getConfig("specs").getObject("pathParams").unwrapped();
                     $.bodyString = config.getConfig("specs").getString("body");
-                }
-        ).createSpecs();
+                }).createSpecs();
     };
 
-
-    //todo: shame on you!
     BiFunction<String,Map<String,Object>, String> setPathParameters = (endpoint, pars) -> {
-        AtomicReference<String> temp = new AtomicReference<>(endpoint);
+        AtomicReference<String> pathParameter = new AtomicReference<>(endpoint);
         pars.keySet().forEach(
-                k -> temp.lazySet(temp.get().replaceFirst("\\{".concat(k).concat("\\}"), pars.get(k).toString())));
-        return temp.get();
+                k -> pathParameter.lazySet(pathParameter.get().replaceFirst("\\{".concat(k).concat("\\}"), pars.get(k).toString())));
+        return pathParameter.get();
     };
 
 
-    //todo: terrible man!
     Function<Map<String,Object>, String[]> mapToStringArray = map -> {
 
-        Iterator<Map.Entry<String,Object>> iter = map.entrySet().iterator();
+        AtomicReference<List<String>> composition = new AtomicReference<>(new ArrayList<>());
 
-        if(!iter.hasNext()) return new String[0];
-        List<String> composition = new ArrayList<>();
-        String[] lista = new String[(map.size() * 2)];
+        map.entrySet().iterator().forEachRemaining(i -> {
+            composition.get().add(i.getKey());
+            composition.get().add(String.valueOf(i.getValue()));
+        });
 
-        while (iter.hasNext()){
-            Map.Entry<String,Object> temp = iter.next();
-            String key = temp.getKey();
-            String value = String.valueOf(temp.getValue());
-            composition.add(key);
-            composition.add(value);
-        }
-
-        for(int i = 0; i < composition.size(); i++){
-            lista[i] = composition.get(i);
-        }
-
-        return lista;
+        return composition.get().toArray(new String[0]);
     };
 
     /**
@@ -83,21 +70,16 @@ public interface BaseUtils {
      * @return an String with Query Parameters. Note: the order is not always guaranteed
      */
     BiFunction<String, Map<String,Object>, String> queryParametersComposition = (url, queryParams) -> {
+
+        AtomicReference<StringBuilder> composition = new AtomicReference<>(new StringBuilder(url.concat("?")));
         Iterator<Map.Entry<String,Object>> iter = queryParams.entrySet().iterator();
 
-        if(!iter.hasNext()) return url;
-        StringBuilder composition = new StringBuilder();
-        composition.append(url).append("?");
+        iter.forEachRemaining(i -> {
+            composition.get().append(i.getKey()).append("=").append(i.getValue());
+            if(iter.hasNext()) composition.get().append("&");
+        });
 
-        while (iter.hasNext()){
-            Map.Entry<String,Object> temp = iter.next();
-            String key = temp.getKey();
-            String value = String.valueOf(temp.getValue());
-            composition.append(key).append("=").append(value);
-            if(iter.hasNext()) composition.append("&");
-        }
-
-        return composition.toString();
+        return composition.get().toString();
     };
 
     /**
