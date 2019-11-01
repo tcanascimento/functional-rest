@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 public interface BaseUtils {
 
     /**
-     * Funciona bem para objetos POJO -Não foi configurado para funcionar com RestSpecs.
+     * Works good for POJO; it was not intented to work for RestSpecs
      */
     BiFunction<String, Class, Object> specsConfigLoaderFromFile = (file, clazz) ->
             ConfigBeanFactory.create(
@@ -67,7 +67,7 @@ public interface BaseUtils {
      *
      * @param url
      * @param queryParams
-     * @return an String with Query Parameters. Note: the order is not always guaranteed
+     * @return a String with Query Parameters. Note: the order is not always guaranteed
      */
     BiFunction<String, Map<String,Object>, String> queryParametersComposition = (url, queryParams) -> {
 
