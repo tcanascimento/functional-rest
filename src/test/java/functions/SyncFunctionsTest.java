@@ -9,10 +9,6 @@ import utils.HelperFunctions;
 import utils.MessageSupplier;
 import utils.TestUtils;
 
-import java.net.http.HttpResponse;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assumptions.assumingThat;
@@ -36,7 +32,7 @@ class SyncFunctionsTest extends HelperFunctions implements SyncFunctions, BaseUt
 
         assertAll(
                 () -> assertNotNull(response.body(), notNull.get()),
-                () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectEqual.get()));
+                () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectContentEquals.get()));
 
     }
 

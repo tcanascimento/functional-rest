@@ -2,6 +2,7 @@ package functions;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import utils.MessageSupplier;
 import utils.TestUtils;
 
 import java.util.Arrays;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @Tag("utils")
-class BaseUtilsTest implements BaseUtils, TestUtils {
+class BaseUtilsTest implements BaseUtils, TestUtils, MessageSupplier {
 
     private Supplier<String> baseURL = () -> "https://www.gateway-empresa.com";
     private Supplier<String> endpoint = () -> "/relatorios/{cnpj}/razao/lancamento/{conta}";
@@ -28,16 +29,16 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
         var specs = specsFromFile.apply(configFile.get());
 
         var formatedEndpoint = queryParametersComposition.apply(setPathParameters.apply(endpoint.get(), pathPars), queryPars);
-        System.out.println(formatedEndpoint);
+//        System.out.println(formatedEndpoint);
 
         assertAll(
-                () -> assertNotNull(specs, "Erro ao carregar arquivo!"),
-                () -> assertEquals(baseURL.get(), specs.getBaseUrl().toString(), "baseURL diferente!"),
-                () -> assertEquals(headers, specs.getHeadersMap(), "Headers diferentes!"),
-                () -> assertEquals(endpoint.get(), specs.getRawEndpoint(), "Endpoint errado!"),
-                () -> assertFalse(formatedEndpoint.contains("{cnpj}"), "Endpoint no formato errado!"),
-                () -> assertEquals(queryPars, specs.getQueryParams(), "Query Parameters não conferem"),
-                () -> assertEquals(pathPars, specs.getPathParams(), "Path Parameters não conferem"),
+                () -> assertNotNull(specs, loadFileError.get()),
+                () -> assertEquals(baseURL.get(), specs.getBaseUrl().toString(), urlMustBeEqual.get()),
+                () -> assertEquals(headers, specs.getHeadersMap(), matchHeaders.get()),
+                () -> assertEquals(endpoint.get(), specs.getRawEndpoint(), endpointFormatError.get()),
+                () -> assertFalse(formatedEndpoint.contains("{cnpj}"), endpointFormatError.get()),
+                () -> assertEquals(queryPars, specs.getQueryParams(), matchQueryPars.get()),
+                () -> assertEquals(pathPars, specs.getPathParams(), matchPathPars.get()),
                 () -> assertNotNull(specs.getURI()));
     }
 
@@ -49,8 +50,8 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
         var expected = "/relatorios/23494210000137/razao/lancamento/2.01.01.01.03";
 
         assertAll(
-                () -> assertNotNull(formatedPath, "Erro ao construir objeto"),
-                () -> assertEquals(expected, formatedPath, "Parâmetros não existentes"));
+                () -> assertNotNull(formatedPath, objectConstructError.get()),
+                () -> assertEquals(expected, formatedPath, nonParameters.get()));
     }
 
     @Tag("array")
@@ -61,9 +62,9 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
         var res = mapToStringArray.apply(basePars);
 
         assertAll(
-                () -> assertNotNull(res, "Objeto não pode ser nulo"),
-                () -> assertEquals(expected.length, res.length, "Arrays diferentes em conteúdo"),
-                () -> assertTrue(equalsList.test(Arrays.asList(expected), Arrays.asList(res)), "Conteúdo deve ser o mesmo"));
+                () -> assertNotNull(res, notNull.get()),
+                () -> assertEquals(expected.length, res.length, objectContentEquals.get()),
+                () -> assertTrue(equalsList.test(Arrays.asList(expected), Arrays.asList(res)), objectContentEquals.get()));
 
     }
 
@@ -75,9 +76,9 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
         var res = mapToStringArray.apply(basePars);
 
         assertAll(
-                () -> assertNotNull(res, "Objeto não pode ser nulo"),
-                () -> assertEquals(expected.length, res.length, "Arrays diferentes em conteúdo"),
-                () -> assertTrue(equalsList.test(Arrays.asList(expected), Arrays.asList(res)), "Conteúdo deve ser o mesmo"));
+                () -> assertNotNull(res, notNull.get()),
+                () -> assertEquals(expected.length, res.length, objectContentEquals.get()),
+                () -> assertTrue(equalsList.test(Arrays.asList(expected), Arrays.asList(res)), objectContentEquals.get()));
 
     }
 
@@ -89,9 +90,9 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
         var res = queryParametersComposition.apply(endpoint.get(), queryPars);
         System.out.println(res);
         assertAll(
-                () -> assertNotNull(res, "Objeto não pode ser nulo"),
-                () -> assertTrue(res.length() >= endpoint.get().length(), "Arrays diferentes em conteúdo"),
-                () -> assertTrue(containsOn.test(res, queryPars), "Conteúdo deve ser o mesmo"));
+                () -> assertNotNull(res, notNull.get()),
+                () -> assertTrue(res.length() >= endpoint.get().length(), objectContentEquals.get()),
+                () -> assertTrue(containsOn.test(res, queryPars), objectContentEquals.get()));
 
     }
 
@@ -103,8 +104,8 @@ class BaseUtilsTest implements BaseUtils, TestUtils {
         var res = generateMapFromString.apply(str);
 
         assertAll(
-                () -> assertNotNull(res, "Objeto não pode ser nulo"),
-                () -> assertSame(res.getClass(), HashMap.class, "Objeto tem que ser do tipo Map")
+                () -> assertNotNull(res, notNull.get()),
+                () -> assertSame(res.getClass(), HashMap.class, objectMapType.get())
         );
     }
 

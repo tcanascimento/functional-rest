@@ -37,7 +37,7 @@ class AsyncFunctionsTest extends HelperFunctions implements AsyncFunctions, Base
 
         assertAll(
                 () -> assertNotNull(response.get().body(), notNull.get()),
-                () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectEqual.get()));
+                () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectContentEquals.get()));
 
     }
 }

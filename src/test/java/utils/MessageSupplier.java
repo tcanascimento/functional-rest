@@ -8,7 +8,7 @@ public interface MessageSupplier {
 
     Supplier<String> notNull = () -> "Return should not be Null!";
 
-    Supplier<String> objectEqual = () -> "Object must be Equals!";
+    Supplier<String> objectContentEquals = () -> "Object or Content must be Equals!";
 
     Supplier<String> urlMustBeEqual = () -> "Url must be Equal!";
 
@@ -29,5 +29,22 @@ public interface MessageSupplier {
     Supplier<String> baseClientNotNull = () -> "BaseClient cannot be null!";
 
     Supplier<String> uriNotNull = () -> "URI cannot be null!";
+
+    Supplier<String> objectMapType= () -> "Objeto tem que ser do tipo Map";
+
+    Supplier<String> objectConstructError = () -> "Error on construct the Object";
+
+    Supplier<String> nonParameters = () -> "No Parameters found";
+
+    Supplier<String> matchPathPars = () -> "Path Parameters do not match";
+
+    Supplier<String> matchQueryPars = () -> "Query Parameters do not match";
+
+    Supplier<String> matchHeaders = () -> "Headers do not match";
+
+    Supplier<String> endpointFormatError = () -> "Endpoint on wrong format";
+
+    Supplier<String> loadFileError = () -> "Error on loading file";
+
 
 }
