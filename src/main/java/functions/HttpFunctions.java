@@ -13,8 +13,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public interface HttpFunctions {
+
+    Supplier<String> errorMessage = () -> "POJO's ERROR - verify it!";
 
     Function<RestSpecs, HttpRequest> requestGET = specs ->
             HttpRequest
@@ -49,9 +52,9 @@ public interface HttpFunctions {
                     .PUT(specs.getBody()).build();
 
     BiFunction<HttpResponse, Class, Object> responseToClass = (response, clazz) ->
-            Try.of(() -> new ObjectMapper().readValue(response.body().toString(), clazz)).getOrElse(()-> "erro de deserializacao; verifique seu POJO");
+            Try.of(() -> new ObjectMapper().readValue(response.body().toString(), clazz)).getOrElse(errorMessage);
 
 
     BiFunction<String, Class, Object> responseBodyToClass = (body, clazz) ->
-            Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrElse(()-> "erro de deserializacao; verifique seu POJO");
+            Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrElse(errorMessage);
 }

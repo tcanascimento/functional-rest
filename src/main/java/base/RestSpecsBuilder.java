@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Builder funcionarl para RestSpecs.
+ * Builder funcional para RestSpecs.
  * Exemplo de uso:
  *         RestSpecs teste = new RestSpecsBuilder().with(
  *                 $ -> {

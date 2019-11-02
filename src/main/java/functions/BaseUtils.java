@@ -45,21 +45,17 @@ public interface BaseUtils {
 
     BiFunction<String,Map<String,Object>, String> setPathParameters = (endpoint, pars) -> {
         AtomicReference<String> pathParameter = new AtomicReference<>(endpoint);
-        pars.keySet().forEach(
-                k -> pathParameter.lazySet(pathParameter.get().replaceFirst("\\{".concat(k).concat("\\}"), pars.get(k).toString())));
+        pars.keySet()
+                .forEach(k -> pathParameter.lazySet(pathParameter.get().replaceFirst("\\{".concat(k).concat("\\}"), pars.get(k).toString())));
         return pathParameter.get();
     };
 
 
     Function<Map<String,Object>, String[]> mapToStringArray = map -> {
-
         AtomicReference<List<String>> composition = new AtomicReference<>(new ArrayList<>());
-
         map.entrySet().iterator().forEachRemaining(i -> {
             composition.get().add(i.getKey());
-            composition.get().add(String.valueOf(i.getValue()));
-        });
-
+            composition.get().add(String.valueOf(i.getValue())); });
         return composition.get().toArray(new String[0]);
     };
 
@@ -70,20 +66,16 @@ public interface BaseUtils {
      * @return a String with Query Parameters. Note: the order is not always guaranteed
      */
     BiFunction<String, Map<String,Object>, String> queryParametersComposition = (url, queryParams) -> {
-
         AtomicReference<StringBuilder> composition = new AtomicReference<>(new StringBuilder(url.concat("?")));
         Iterator<Map.Entry<String,Object>> iter = queryParams.entrySet().iterator();
-
         iter.forEachRemaining(i -> {
             composition.get().append(i.getKey()).append("=").append(i.getValue());
-            if(iter.hasNext()) composition.get().append("&");
-        });
-
+            if(iter.hasNext()) composition.get().append("&"); });
         return composition.get().toString();
     };
 
     /**
-     * Função para gerar Map<String,Object> a partir de uma representação de json em String
+     * Function to generate Map<String, Object> from a json String
      */
     Function<String, Map<String, Object>> generateMapFromString = dataVar ->
             Arrays.stream(dataVar.replace("{", "").replace("}", "").split(","))
