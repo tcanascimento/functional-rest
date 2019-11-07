@@ -6,3 +6,4 @@ out/
 .project
 rest-functions.iml
 .settings
+gradle.properties
