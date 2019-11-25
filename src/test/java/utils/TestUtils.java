@@ -1,15 +1,11 @@
 package utils;
 
 import base.RestSpecs;
-import functions.AsyncFunctions;
-import io.vavr.API;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 
-import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;

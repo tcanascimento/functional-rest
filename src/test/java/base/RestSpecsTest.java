@@ -1,9 +1,8 @@
 package base;
 
-import functions.AsyncFunctions;
 import functions.BaseUtils;
 import functions.HttpFunctions;
-import functions.SyncFunctions;
+import functions.RestFunctions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import utils.MessageSupplier;
@@ -12,7 +11,7 @@ import utils.TestUtils;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("specs")
-class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFunctions, TestUtils, MessageSupplier {
+class RestSpecsTest implements RestFunctions, BaseUtils, HttpFunctions, TestUtils, MessageSupplier {
 
     @Tag("builder")
     @Test

@@ -6,6 +6,7 @@ package base;
  */
 
 import functions.BaseUtils;
+import io.vavr.API;
 import io.vavr.control.Try;
 
 import java.net.Authenticator;
@@ -17,7 +18,11 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
 
 public final class RestSpecs implements BaseUtils {
 
@@ -63,12 +68,11 @@ public final class RestSpecs implements BaseUtils {
     }
 
     public HttpResponse.BodyHandler getResponseBodyHandler(){
-        switch (responseHandlerType){
-            case 's': return HttpResponse.BodyHandlers.ofString();
-            case 'i': return HttpResponse.BodyHandlers.ofInputStream();
-            case 'b': return HttpResponse.BodyHandlers.ofByteArray();
-            default: return HttpResponse.BodyHandlers.ofString();
-        }
+        return API.Match(responseHandlerType).of(
+                Case($('s'), HttpResponse.BodyHandlers.ofString()),
+                Case($('i'), HttpResponse.BodyHandlers.ofInputStream()),
+                Case($('b'), HttpResponse.BodyHandlers.ofByteArray()),
+                Case($(), (Supplier<HttpResponse.BodyHandler<String>>) HttpResponse.BodyHandlers::ofString));
     }
 
     public char getResponseHandlerType() {

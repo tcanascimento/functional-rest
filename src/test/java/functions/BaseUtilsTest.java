@@ -8,6 +8,7 @@ import utils.TestUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,14 +101,18 @@ class BaseUtilsTest implements BaseUtils, TestUtils, MessageSupplier {
     @Test
     void mapFromStringTest(){
 
-        var str = "{\"ano\": 2019, \"mesInicial\": '1' , \"mesFinal\": 12}";
+        var str = "{\"ano\": 2019, \"mesInicial\": 1 , \"mesFinal\": 12}";
         var res = generateMapFromString.apply(str);
+
+        Set<String> keys = Set.of("\"ano\"", "\"mesInicial\"", "\"mesFinal\"");
+        Set<String> values = Set.of(String.valueOf(2019), String.valueOf(1), String.valueOf(12));
 
         assertAll(
                 () -> assertNotNull(res, notNull.get()),
-                () -> assertSame(res.getClass(), HashMap.class, objectMapType.get())
+                () -> assertSame(res.getClass(), HashMap.class, objectMapType.get()),
+                () -> assertTrue(res.keySet().containsAll(keys)),
+                () -> assertTrue(res.values().containsAll(values))
         );
     }
-
 
 }

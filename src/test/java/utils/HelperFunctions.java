@@ -1,33 +1,23 @@
 package utils;
 
 import base.RestSpecs;
-import functions.AsyncFunctions;
-import functions.SyncFunctions;
+import functions.HttpFunctions;
 import io.vavr.API;
 
-import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
+import java.net.http.HttpRequest;
 import java.util.function.Function;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 
-public abstract class HelperFunctions implements AsyncFunctions, SyncFunctions {
+public interface HelperFunctions extends HttpFunctions {
 
-    protected Function<String, Function<RestSpecs, CompletableFuture<HttpResponse>>> mapRequestMethodToAsync = method ->
+    Function<String, Function<RestSpecs, HttpRequest>> mapRequestMethod = method ->
             API.Match(method).of(
-                    Case($("/get"), asyncRequestGET),
-                    Case($("/post"), asyncRequestPOST),
-                    Case($("/put"), asyncRequestPUT),
-                    Case($("/delete"), asyncRequestDELETE),
-                    Case($(), () -> asyncRequestGET));
-
-    protected Function<String, Function<RestSpecs, HttpResponse>> mapRequestMethodToSync = method ->
-            API.Match(method).of(
-                    Case($("/get"), syncRequestGET),
-                    Case($("/post"), syncRequestPost),
-                    Case($("/put"), syncRequestPUT),
-                    Case($("/delete"), syncRequestDELETE),
-                    Case($(), () -> syncRequestGET));
+                    Case($("/get"), requestGET),
+                    Case($("/post"), requestPOST),
+                    Case($("/put"), requestPUT),
+                    Case($("/delete"), requestDELETE),
+                    Case($(), () -> requestGET));
 
 }

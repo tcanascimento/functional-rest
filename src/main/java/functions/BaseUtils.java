@@ -43,12 +43,21 @@ public interface BaseUtils {
                 }).createSpecs();
     };
 
+    //todo: refactor
     BiFunction<String,Map<String,Object>, String> setPathParameters = (endpoint, pars) -> {
         AtomicReference<String> pathParameter = new AtomicReference<>(endpoint);
         pars.keySet()
                 .forEach(k -> pathParameter.lazySet(pathParameter.get().replaceFirst("\\{".concat(k).concat("\\}"), pars.get(k).toString())));
+
+//        var temp =  pars.keySet()
+//                .stream()
+//                .map(k -> endpoint.replaceAll("\\{".concat(k).concat("\\}"), pars.get(k).toString()))
+//                .reduce(String::join).orElse(endpoint);
+//        return temp;
         return pathParameter.get();
     };
+
+
 
 
     Function<Map<String,Object>, String[]> mapToStringArray = map -> {

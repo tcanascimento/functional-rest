@@ -2,9 +2,9 @@ package samples;
 
 import base.RestSpecs;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import functions.AsyncFunctions;
 import functions.BaseUtils;
-import functions.SyncFunctions;
+import functions.HttpFunctions;
+import functions.RestFunctions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-class SampleTest extends HelperFunctions implements SyncFunctions, AsyncFunctions, BaseUtils, MessageSupplier, TestUtils {
+class SampleTest implements RestFunctions, HelperFunctions, HttpFunctions, BaseUtils, MessageSupplier, TestUtils {
 
     private Supplier<Map<String, Object>> headers = () -> Map.of("Content-Type", "application/json");
 
@@ -33,7 +33,7 @@ class SampleTest extends HelperFunctions implements SyncFunctions, AsyncFunction
     void asyncSampleTest() {
 
         var specs = new RestSpecs(httpBinBaseURL.get().concat("/get"), headers.get(), "");
-        var response = asyncRequestGET.apply(specs);
+        var response = asyncRequest.apply(requestGET.apply(specs), specs);
 
         assertAll( "Validação básica",
                 () -> assertNotNull(response.get().body()),
@@ -45,7 +45,7 @@ class SampleTest extends HelperFunctions implements SyncFunctions, AsyncFunction
     void syncSampleTest() throws IOException {
 
         var specs = new RestSpecs(httpBinBaseURL.get().concat("/post"), headers.get(), "");
-        var response = syncRequestPost.apply(specs);
+        var response = syncRequest.apply(requestPOST.apply(specs), specs);
 
         assertAll( "Validação básica",
                 () -> assertNotNull(response.body()),
@@ -58,7 +58,8 @@ class SampleTest extends HelperFunctions implements SyncFunctions, AsyncFunction
     @Test
     void specsFromConfSampleTest(){
 
-        var response = specsFromFile.andThen(asyncRequestGET).apply(configSync.get());
+        var specs = specsFromFile.apply(configSync.get());
+        var response = asyncRequest.apply(requestGET.apply(specs), specs);
         assertAll( "Validação básica",
                 () -> assertNotNull(response.get().body()),
                 () -> assertEquals(200, response.get().statusCode()));
@@ -72,7 +73,9 @@ class SampleTest extends HelperFunctions implements SyncFunctions, AsyncFunction
 
         var method = data.getString(0);
 
-        var response = updateRestSpecs.andThen(mapRequestMethodToAsync.apply(method)).apply(data, specsFromFile.apply(configSync.get()));
+        var specs = updateRestSpecs.apply(data,specsFromFile.apply(configSync.get()));
+
+        var response = asyncRequestFunction.apply(mapRequestMethod.apply(method), specs);
 
         assumeTrue(response.get().statusCode() >= data.getInteger(1), statusCode200.get());
 
