@@ -14,11 +14,9 @@ import com.typesafe.config.ConfigFactory;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public interface BaseUtils {
 
@@ -48,12 +46,6 @@ public interface BaseUtils {
         AtomicReference<String> pathParameter = new AtomicReference<>(endpoint);
         pars.keySet()
                 .forEach(k -> pathParameter.lazySet(pathParameter.get().replaceFirst("\\{".concat(k).concat("\\}"), pars.get(k).toString())));
-
-//        var temp =  pars.keySet()
-//                .stream()
-//                .map(k -> endpoint.replaceAll("\\{".concat(k).concat("\\}"), pars.get(k).toString()))
-//                .reduce(String::join).orElse(endpoint);
-//        return temp;
         return pathParameter.get();
     };
 
@@ -90,5 +82,6 @@ public interface BaseUtils {
             Arrays.stream(dataVar.replace("{", "").replace("}", "").split(","))
                     .map(s -> s.split(":"))
                     .collect(Collectors.toMap(k -> k[0].strip(), k -> k[1].strip()));
+
 
 }

@@ -26,4 +26,6 @@ public interface RestFunctions {
     BiFunction<Function<RestSpecs, HttpRequest>, RestSpecs, CompletableFuture<HttpResponse>> asyncRequestFunction = (request, specs) ->
             specs.getBaseClient().sendAsync(request.apply(specs),
                     specs.getResponseBodyHandler());
+
+
 }

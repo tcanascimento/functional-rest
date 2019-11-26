@@ -2,22 +2,21 @@ package functions;
 
 /**
  * author: Thiago Carreira
- * license: Apache2
+ *   license: Apache2
  */
 
 import base.RestSpecs;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.vavr.control.Try;
+import io.vavr.API;
 
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
+
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+
 
 public interface HttpFunctions {
 
-    Supplier<String> errorMessage = () -> "POJO's ERROR - verify it!";
 
     Function<RestSpecs, HttpRequest> requestGET = specs ->
             HttpRequest
@@ -51,10 +50,12 @@ public interface HttpFunctions {
                     .headers(specs.getHeaders())
                     .PUT(specs.getBody()).build();
 
-    BiFunction<HttpResponse, Class, Object> responseToClass = (response, clazz) ->
-            Try.of(() -> new ObjectMapper().readValue(response.body().toString(), clazz)).getOrElse(errorMessage);
 
+    Function<String, Function<RestSpecs, HttpRequest>> getRequestFunction = requestMethod ->
+            API.Match(requestMethod.toUpperCase()).of(
+                    Case($("GET"), requestGET),
+                    Case($("POST"), requestPOST),
+                    Case($("PUT"), requestPUT),
+                    Case($("DELETE"), requestDELETE));
 
-    BiFunction<String, Class, Object> responseBodyToClass = (body, clazz) ->
-            Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrElse(errorMessage);
 }

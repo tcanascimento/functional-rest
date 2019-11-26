@@ -41,6 +41,9 @@ public final class RestSpecs implements BaseUtils {
     private HttpClient baseClient;
     private URI uri;
 
+    //todo: set do specs
+    private String requestMethod;
+
 
     public RestSpecs(String baseUrl, Map<String, Object> headersParams, String body){
         this.baseUrl = URI.create(baseUrl);
@@ -122,6 +125,9 @@ public final class RestSpecs implements BaseUtils {
         this.body = HttpRequest.BodyPublishers.noBody();
     }
 
+    public void setRequestMethod(String method){
+        this.requestMethod = method;
+    }
 
     private void setBody(String requestBody) {
         if (requestBody.endsWith(".json")) {
@@ -228,6 +234,7 @@ public final class RestSpecs implements BaseUtils {
                    .build();
        }
     }
+
 
     @Override
     public String toString() {

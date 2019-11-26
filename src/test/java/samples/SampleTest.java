@@ -46,12 +46,16 @@ class SampleTest implements RestFunctions, HelperFunctions, HttpFunctions, BaseU
 
         var specs = new RestSpecs(httpBinBaseURL.get().concat("/post"), headers.get(), "");
         var response = syncRequest.apply(requestPOST.apply(specs), specs);
+        var body = new ObjectMapper().readValue(response.body().toString(), ResponseObject.class);
 
         assertAll( "Validação básica",
                 () -> assertNotNull(response.body()),
-                () -> assertEquals(200, response.statusCode()));
+                () -> assertEquals(200, response.statusCode()),
+                () -> assertEquals(specs.getBaseUrl().toString(), body.getUrl()));
 
-        var body = new ObjectMapper().readValue(response.body().toString(), ResponseObject.class);
+
+
+        System.out.println("body: "+ body);
 
     }
 
