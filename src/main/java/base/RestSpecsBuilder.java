@@ -28,6 +28,7 @@ public class RestSpecsBuilder implements BaseUtils {
     public String baseUrl2;
     public String endpoint2;
     public String bodyString;
+    public String requestMethod;
 
     public RestSpecsBuilder with(Consumer<RestSpecsBuilder> builderFunction) {
         builderFunction.accept(this);
@@ -35,7 +36,7 @@ public class RestSpecsBuilder implements BaseUtils {
     }
 
     public RestSpecs createSpecs(){
-        return new RestSpecs(baseUrl2, endpoint2, headersParams, queryParams, pathParams, bodyString);
+        return new RestSpecs(baseUrl2, endpoint2, headersParams, queryParams, pathParams, bodyString, requestMethod);
     }
 
 }

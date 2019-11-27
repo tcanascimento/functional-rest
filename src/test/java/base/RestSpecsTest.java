@@ -1,17 +1,27 @@
 package base;
 
 import functions.BaseUtils;
+import functions.Helpers;
 import functions.HttpFunctions;
 import functions.RestFunctions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import pojo.ResponseObject;
 import utils.MessageSupplier;
 import utils.TestUtils;
 
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Tag("specs")
-class RestSpecsTest implements RestFunctions, BaseUtils, HttpFunctions, TestUtils, MessageSupplier {
+class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions, TestUtils, MessageSupplier {
 
     @Tag("builder")
     @Test
@@ -37,6 +47,7 @@ class RestSpecsTest implements RestFunctions, BaseUtils, HttpFunctions, TestUtil
 
         var specs = specsFromFile.apply(configFile.get());
 
+
         assertAll("Load Specs from Config File",
                 () -> assertNotNull(specs, specsNotNull.get()),
                 () -> assertNotNull(specs.getBaseUrl(), baseURLNotNull.get()),
@@ -46,8 +57,12 @@ class RestSpecsTest implements RestFunctions, BaseUtils, HttpFunctions, TestUtil
                 () -> assertNotNull(specs.getPathParams(), pathParametersNotNull.get()),
                 () -> assertNotNull(specs.getQueryParams(), queryParametersNotNull.get()),
                 () -> assertNotNull(specs.getBaseClient(), baseClientNotNull.get()),
+                () -> assertNotNull(specs.getRawRequestMethod(), requestMethodNotNull.get()),
+                () -> assertTrue(specs.getRawRequestMethod().equalsIgnoreCase( "PUT"), requestMethodNotNull.get()),
                 () -> assertNotNull(specs.getURI(), uriNotNull.get())
         );
+
+        System.out.println("Method: " +specs.getRequestMethod().toString());
 
     }
 
@@ -56,7 +71,7 @@ class RestSpecsTest implements RestFunctions, BaseUtils, HttpFunctions, TestUtil
     @Test
     void specsConstructorSimpleTest() {
 
-        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "");
+        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "", "get");
 
         assertAll("Just BaseURL, Headers and empty body for Constructor",
                 () -> assertNotNull(specs, specsNotNull.get()),
@@ -65,13 +80,28 @@ class RestSpecsTest implements RestFunctions, BaseUtils, HttpFunctions, TestUtil
                 () -> assertNotNull(specs.getBaseClient(), baseClientNotNull.get()),
                 () -> assertNotNull(specs.getURI(), uriNotNull.get()));
 
-        /*var response = asyncRequestGET.apply(specs);
+    }
 
-        System.out.println("Status Code: "+ response.thenApply(HttpResponse::statusCode).get());
-        System.out.println("Body: " + response.get().body());
-        System.out.println("Headers: " + response.get().headers());
+    @Tags({@Tag("specs")})
+    @DisplayName(value = "Rest Specs Method")
+    @ParameterizedTest(name = "Async sample Http test {index} with [{arguments}]")
+    @CsvFileSource(resources = "/sync-data.csv", numLinesToSkip = 1)
+    void syncTest(ArgumentsAccessor data) throws ExecutionException, InterruptedException {
 
-        System.out.println("\nHttpResponse: " + response.get());*/
+        var specs = updateRestSpecs.apply(data,specsFromFile.apply(configSync.get()));
+
+        var response = asyncRequest.apply(specs);
+
+        assumeTrue(response.get().statusCode() >= data.getInteger(2), statusCode200.get());
+
+        response.join().request();
+
+        var responseObject = (ResponseObject) responseToClass.apply(response.get(), ResponseObject.class);
+
+        assertAll(
+                () -> assertNotNull(response.get().body(), notNull.get()),
+                () -> assertTrue(specs.getRawRequestMethod().equalsIgnoreCase(data.getString(1)), objectContentEquals.get()),
+                () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectContentEquals.get()));
 
     }
 

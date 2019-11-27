@@ -38,6 +38,6 @@ public interface TestUtils {
     Function<TestSourceTemplate,List<String>> setParams = (data) ->  Arrays.asList(data.getQueryParams().replaceAll("[^a-zA-Z0-9,]","").split(","));
 
     BiFunction<ArgumentsAccessor, RestSpecs, RestSpecs> updateRestSpecs = (data, specs) ->
-        new RestSpecs(specs.getBaseUrl().toString(), data.getString(0), specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(),"");
+        new RestSpecs(specs.getBaseUrl().toString(), data.getString(0), specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(),"", data.getString(1));
 
 }

@@ -6,6 +6,7 @@ package base;
  */
 
 import functions.BaseUtils;
+import functions.HttpFunctions;
 import io.vavr.API;
 import io.vavr.control.Try;
 
@@ -41,25 +42,26 @@ public final class RestSpecs implements BaseUtils {
     private HttpClient baseClient;
     private URI uri;
 
-    //todo: set do specs
     private String requestMethod;
 
 
-    public RestSpecs(String baseUrl, Map<String, Object> headersParams, String body){
+    public RestSpecs(String baseUrl, Map<String, Object> headersParams, String body, String requestMethod){
         this.baseUrl = URI.create(baseUrl);
         this.uri = URI.create(baseUrl);
         this.headers = headersParams;
+        this.requestMethod = requestMethod;
         if(body != null) setBody(body); else setBody("");
     }
 
     public RestSpecs(String baseUrl, String endp, Map<String, Object> headersParams, Map<String, Object> queryParams,
-                     Map<String, Object> pathParams, String body) {
+                     Map<String, Object> pathParams, String body, String requestMethod) {
         this.baseUrl = URI.create(baseUrl);
         this.headers = headersParams;
         this.endpoint = endp;
         var tempEndpoint = this.endpoint;
         this.pathParams = pathParams;
         this.queryParams = queryParams;
+        this.requestMethod = requestMethod;
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setQueryParams(tempEndpoint, queryParams);
         if(getRawEndpoint() != null) setURI(baseUrl, tempEndpoint); else this.uri = URI.create(baseUrl);
@@ -209,6 +211,26 @@ public final class RestSpecs implements BaseUtils {
         this.uri = URI.create(uri);
     }
 
+    public HttpRequest getRequestMethod(){
+        return API.Match(getRawRequestMethod().toUpperCase()).of(
+                Case($("GET"), baseRequestBuilder().GET().build()),
+                Case($("POST"), baseRequestBuilder().POST(this.getBody()).build()),
+                Case($("PUT"), baseRequestBuilder().PUT(this.getBody()).build()),
+                Case($("DELETE"), baseRequestBuilder().DELETE().build()));
+    }
+
+    public String getRawRequestMethod(){
+        return this.requestMethod;
+    }
+
+    private HttpRequest.Builder baseRequestBuilder(){
+        return HttpRequest
+                .newBuilder()
+                .uri(this.getURI())
+                .timeout(this.getTimeout())
+                .headers(this.getHeaders());
+    }
+
     /**
      *
      * @param endpoint
@@ -246,6 +268,7 @@ public final class RestSpecs implements BaseUtils {
                 ", queryParams=" + queryParams +
                 ", pathParams=" + pathParams +
                 ", body=" + body +
+                ", requestMethod=" + requestMethod +
                 ", responseHandlerType=" + responseHandlerType +
                 ", authenticator=" + authenticator +
                 ", cookieHandler=" + cookieHandler +

@@ -3,6 +3,7 @@ package samples;
 import base.RestSpecs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import functions.BaseUtils;
+import functions.Helpers;
 import functions.HttpFunctions;
 import functions.RestFunctions;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +14,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import pojo.ResponseObject;
-import utils.HelperFunctions;
 import utils.MessageSupplier;
 import utils.TestUtils;
 
@@ -25,15 +25,15 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-class SampleTest implements RestFunctions, HelperFunctions, HttpFunctions, BaseUtils, MessageSupplier, TestUtils {
+class SampleTest implements RestFunctions, Helpers, HttpFunctions, BaseUtils, MessageSupplier, TestUtils {
 
     private Supplier<Map<String, Object>> headers = () -> Map.of("Content-Type", "application/json");
 
     @Test
     void asyncSampleTest() {
 
-        var specs = new RestSpecs(httpBinBaseURL.get().concat("/get"), headers.get(), "");
-        var response = asyncRequest.apply(requestGET.apply(specs), specs);
+        var specs = new RestSpecs(httpBinBaseURL.get().concat("/get"), headers.get(), "", "get");
+        var response = asyncRequest.apply(specs);
 
         assertAll( "Validação básica",
                 () -> assertNotNull(response.get().body()),
@@ -44,8 +44,8 @@ class SampleTest implements RestFunctions, HelperFunctions, HttpFunctions, BaseU
     @Test
     void syncSampleTest() throws IOException {
 
-        var specs = new RestSpecs(httpBinBaseURL.get().concat("/post"), headers.get(), "");
-        var response = syncRequest.apply(requestPOST.apply(specs), specs);
+        var specs = new RestSpecs(httpBinBaseURL.get().concat("/post"), headers.get(), "", "post");
+        var response = syncRequest.apply(specs).get();
         var body = new ObjectMapper().readValue(response.body().toString(), ResponseObject.class);
 
         assertAll( "Validação básica",
@@ -63,7 +63,7 @@ class SampleTest implements RestFunctions, HelperFunctions, HttpFunctions, BaseU
     void specsFromConfSampleTest(){
 
         var specs = specsFromFile.apply(configSync.get());
-        var response = asyncRequest.apply(requestGET.apply(specs), specs);
+        var response = asyncRequest.apply(specs);
         assertAll( "Validação básica",
                 () -> assertNotNull(response.get().body()),
                 () -> assertEquals(200, response.get().statusCode()));
@@ -79,9 +79,9 @@ class SampleTest implements RestFunctions, HelperFunctions, HttpFunctions, BaseU
 
         var specs = updateRestSpecs.apply(data,specsFromFile.apply(configSync.get()));
 
-        var response = asyncRequestFunction.apply(mapRequestMethod.apply(method), specs);
+        var response = asyncRequest.apply(specs);
 
-        assumeTrue(response.get().statusCode() >= data.getInteger(1), statusCode200.get());
+        assumeTrue(response.get().statusCode() >= data.getInteger(2), statusCode200.get());
 
         var responseObject = (ResponseObject) responseToClass.apply(response.get(), ResponseObject.class);
 

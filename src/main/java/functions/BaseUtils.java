@@ -38,6 +38,7 @@ public interface BaseUtils {
                     $.queryParams = config.getConfig("specs").getObject("queryParams").unwrapped();
                     $.pathParams = config.getConfig("specs").getObject("pathParams").unwrapped();
                     $.bodyString = config.getConfig("specs").getString("body");
+                    $.requestMethod = config.getConfig("specs").getString("requestMethod");
                 }).createSpecs();
     };
 

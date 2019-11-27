@@ -7,7 +7,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import pojo.ResponseObject;
-import utils.HelperFunctions;
 import utils.MessageSupplier;
 import utils.TestUtils;
 
@@ -16,8 +15,8 @@ import java.util.concurrent.ExecutionException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-@Tag("async")
-class FunctionsTest implements HelperFunctions, RestFunctions, BaseUtils, MessageSupplier, TestUtils {
+@Tags({@Tag("sync"), @Tag("async")})
+class FunctionsTest implements Helpers, RestFunctions, BaseUtils, MessageSupplier, TestUtils {
 
     @Tags({@Tag("sync")})
     @DisplayName(value = "Async Http")
@@ -25,13 +24,11 @@ class FunctionsTest implements HelperFunctions, RestFunctions, BaseUtils, Messag
     @CsvFileSource(resources = "/sync-data.csv", numLinesToSkip = 1)
     void asyncTest(ArgumentsAccessor data) throws ExecutionException, InterruptedException {
 
-        var method = data.getString(0);
-
         var specs = updateRestSpecs.apply(data,specsFromFile.apply(configSync.get()));
 
-        var response = asyncRequest.apply(mapRequestMethod.apply(method).apply(specs), specs);
+        var response = asyncRequest.apply(specs);
 
-        assumeTrue(response.get().statusCode() >= data.getInteger(1), statusCode200.get());
+        assumeTrue(response.get().statusCode() >= data.getInteger(2), statusCode200.get());
 
         var responseObject = (ResponseObject) responseToClass.apply(response.get(), ResponseObject.class);
 
@@ -49,13 +46,11 @@ class FunctionsTest implements HelperFunctions, RestFunctions, BaseUtils, Messag
     @CsvFileSource(resources = "/sync-data.csv", numLinesToSkip = 1)
     void syncTest(ArgumentsAccessor data) {
 
-        var method = data.getString(0);
+        var specs = updateRestSpecs.apply(data,specsFromFile.apply(configSync.get()));
 
-        var specs = specsFromFile.apply(configSync.get());
+        var response = syncRequest.apply(specs).get();
 
-        var response = syncRequest.apply(mapRequestMethod.apply(method).apply(specs), specs);
-
-        assumeTrue(response.statusCode() >= data.getInteger(1), statusCode200.get());
+        assumeTrue(response.statusCode() >= data.getInteger(2), statusCode200.get());
 
         var responseObject = (ResponseObject) responseToClass.apply(response, ResponseObject.class);
 

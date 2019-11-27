@@ -46,5 +46,7 @@ public interface MessageSupplier {
 
     Supplier<String> loadFileError = () -> "Error on loading file";
 
+    Supplier<String> requestMethodNotNull = () -> "Request Method can not be null!";
+
 
 }

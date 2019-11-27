@@ -20,20 +20,20 @@ public interface Helpers {
                     specs.getRawEndpoint(),
                     specs.getHeadersMap(),
                     specs.getQueryParams(),
-                    pathParams, specs.getBody().toString());
+                    pathParams, specs.getBody().toString(), specs.getRawRequestMethod());
 
     BiFunction<Map<String,Object>, RestSpecs, RestSpecs> updateQueryParams = (queryParams, specs) ->
             new RestSpecs(specs.getBaseUrl().toString(),
                     specs.getRawEndpoint(),
                     specs.getHeadersMap(),
                     queryParams,
-                    specs.getPathParams(), specs.getBody().toString());
+                    specs.getPathParams(), specs.getBody().toString(), specs.getRawRequestMethod());
 
     BiFunction<String, RestSpecs, RestSpecs> updateEndpoint = (endpoint, specs) ->
-            new RestSpecs(specs.getBaseUrl().toString(), endpoint, specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(), specs.getBody().toString());
+            new RestSpecs(specs.getBaseUrl().toString(), endpoint, specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(), specs.getBody().toString(), specs.getRawRequestMethod());
 
     BiFunction<String, RestSpecs, RestSpecs> updateBody = (body, specs) ->
-            new RestSpecs(specs.getBaseUrl().toString(), specs.getRawEndpoint(), specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(), body);
+            new RestSpecs(specs.getBaseUrl().toString(), specs.getRawEndpoint(), specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(), body, specs.getRawRequestMethod());
 
 
     Function<Object, String> clazzToJson = object ->
