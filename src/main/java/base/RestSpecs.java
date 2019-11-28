@@ -49,6 +49,7 @@ public final class RestSpecs implements BaseUtils {
         this.baseUrl = URI.create(baseUrl);
         this.uri = URI.create(baseUrl);
         this.headers = headersParams;
+        assert(!requestMethod.isBlank()): "you should specify a request method!";
         this.requestMethod = requestMethod;
         if(body != null) setBody(body); else setBody("");
     }
@@ -61,6 +62,7 @@ public final class RestSpecs implements BaseUtils {
         var tempEndpoint = this.endpoint;
         this.pathParams = pathParams;
         this.queryParams = queryParams;
+        assert(!requestMethod.isBlank()): "you should specify a request method!";
         this.requestMethod = requestMethod;
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setQueryParams(tempEndpoint, queryParams);
@@ -73,7 +75,7 @@ public final class RestSpecs implements BaseUtils {
     }
 
     public HttpResponse.BodyHandler getResponseBodyHandler(){
-        return API.Match(responseHandlerType).of(
+        return API.Match(this.responseHandlerType).of(
                 Case($('s'), HttpResponse.BodyHandlers.ofString()),
                 Case($('i'), HttpResponse.BodyHandlers.ofInputStream()),
                 Case($('b'), HttpResponse.BodyHandlers.ofByteArray()),
@@ -92,9 +94,9 @@ public final class RestSpecs implements BaseUtils {
         this.responseHandlerType = responseHandlerType;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        assert baseUrl.isBlank(): "baseURL cannot be empty!";
-        this.baseUrl = URI.create(baseUrl);
+    public void setBaseUrl(String url) {
+        assert(!url.isBlank()): "baseURL cannot be empty!";
+        this.baseUrl = URI.create(url);
     }
 
     public URI getURI() {
@@ -212,7 +214,7 @@ public final class RestSpecs implements BaseUtils {
     }
 
     public HttpRequest getRequestMethod(){
-        return API.Match(getRawRequestMethod().toUpperCase()).of(
+        return API.Match(this.getRawRequestMethod().toUpperCase()).of(
                 Case($("GET"), baseRequestBuilder().GET().build()),
                 Case($("POST"), baseRequestBuilder().POST(this.getBody()).build()),
                 Case($("PUT"), baseRequestBuilder().PUT(this.getBody()).build()),
@@ -234,23 +236,23 @@ public final class RestSpecs implements BaseUtils {
     /**
      *
      * @param endpoint
-     * @param queryParams as Map, it does not guarantee order; so, API should how to resolve parameters indepently of their order.
+     * @param queryPars as Map, it does not guarantee order; so, API should how to resolve parameters.
      * @return
      */
-    private String setQueryParams(String endpoint, Map<String, Object> queryParams){
-        this.queryParams = queryParams;
-        return (queryParams == null || queryParams.size() < 2) ? endpoint : queryParametersComposition.apply(endpoint, queryParams);
+    private String setQueryParams(String endpoint, Map<String, Object> queryPars){
+        this.queryParams = queryPars;
+        return (queryPars == null || queryPars.size() < 2) ? endpoint : queryParametersComposition.apply(endpoint, queryPars);
     }
 
     private void buildBaseClient() {
        if(cookieHandler != null) {
-           baseClient = HttpClient
+           this.baseClient = HttpClient
                    .newBuilder()
                    .cookieHandler(cookieHandler)
                    .connectTimeout(timeout)
                    .build();
        } else {
-           baseClient = HttpClient
+           this.baseClient = HttpClient
                    .newBuilder()
                    .connectTimeout(timeout)
                    .build();

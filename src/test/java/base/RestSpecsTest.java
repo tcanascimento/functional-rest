@@ -4,6 +4,7 @@ import functions.BaseUtils;
 import functions.Helpers;
 import functions.HttpFunctions;
 import functions.RestFunctions;
+import io.vavr.Lazy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -15,7 +16,9 @@ import pojo.ResponseObject;
 import utils.MessageSupplier;
 import utils.TestUtils;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -32,6 +35,7 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
                     $.baseUrl2 = googleBaseURL.get();
                     $.headersParams = headers.get();
                     $.bodyString = "";
+                    $.requestMethod = "get";
                 }).createSpecs();
 
         assertAll("Just BaseURL and Headers from Builder",
@@ -79,6 +83,36 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
                 () -> assertNotNull(specs.getHeaders(), headersNotNull.get()),
                 () -> assertNotNull(specs.getBaseClient(), baseClientNotNull.get()),
                 () -> assertNotNull(specs.getURI(), uriNotNull.get()));
+
+    }
+
+    @Tag("method-exception")
+    @Test
+    void specsConstructorExceptionTest() {
+
+        var exceptionMsg = "you should specify a request method!"; //"baseURL cannot be empty!";
+
+        var exception = assertThrows(AssertionError.class, () -> new RestSpecs(googleBaseURL.get(), headers.get(), "", ""));
+        var exceptionFullConstructor = assertThrows(AssertionError.class, () -> new RestSpecs(
+                googleBaseURL.get(), "", headers.get(), Map.of(), Map.of(), "", ""
+        ));
+
+        assertAll("Raising exception for request method empty String",
+                () -> assertEquals(exceptionFullConstructor.getMessage(), exceptionMsg),
+                () -> assertEquals(exception.getMessage(), exceptionMsg));
+
+    }
+
+    @Tag("baseURL-exception")
+    @Test
+    void specsBaseURLExceptionTest() {
+
+        var exceptionMsg = "baseURL cannot be empty!";
+        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "", "GET");
+        var exception = assertThrows(AssertionError.class, () -> specs.setBaseUrl(""));
+
+        assertAll("Raising exception for baseURL empty String",
+                () -> assertEquals(exception.getMessage(), exceptionMsg));
 
     }
 
