@@ -1,52 +1,52 @@
 package utils;
 
-import java.util.function.Supplier;
+import io.vavr.Lazy;
 
 public interface MessageSupplier {
 
-    Supplier<String> statusCode200 = () -> "Status Code should be 200";
+    Lazy<String> statusCode200 = Lazy.of(() -> "Status Code should be 200");
 
-    Supplier<String> notNull = () -> "Return should not be Null!";
+    Lazy<String> notNull = Lazy.of(() -> "Return should not be Null!");
 
-    Supplier<String> objectContentEquals = () -> "Object or Content must be Equals!";
+    Lazy<String> objectContentEquals = Lazy.of(() -> "Object or Content must be Equals!");
 
-    Supplier<String> urlMustBeEqual = () -> "Url must be Equal!";
+    Lazy<String> urlMustBeEqual = Lazy.of(() -> "Url must be Equal!");
 
-    Supplier<String> specsNotNull = () -> "Specs cannot be null!";
+    Lazy<String> specsNotNull = Lazy.of(() -> "Specs cannot be null!");
 
-    Supplier<String> baseURLNotNull = () -> "BaseURL cannot be null!";
+    Lazy<String> baseURLNotNull = Lazy.of(() -> "BaseURL cannot be null!");
 
-    Supplier<String> rawEndpointNotNull = () -> "Raw endpoint cannot be null!";
+    Lazy<String> rawEndpointNotNull = Lazy.of(() -> "Raw endpoint cannot be null!");
 
-    Supplier<String> formatedEndpointNotNull = () -> "Formated endpoint cannot be null";
+    Lazy<String> formatedEndpointNotNull = Lazy.of(() -> "Formated endpoint cannot be null");
 
-    Supplier<String> headersNotNull = () -> "Headers cannot be null!";
+    Lazy<String> headersNotNull = Lazy.of(() -> "Headers cannot be null!");
 
-    Supplier<String> pathParametersNotNull = () -> "PathParameters cannot be null!";
+    Lazy<String> pathParametersNotNull = Lazy.of(() -> "PathParameters cannot be null!");
 
-    Supplier<String> queryParametersNotNull = () -> "QueryParameters cannot be null!";
+    Lazy<String> queryParametersNotNull = Lazy.of(() -> "QueryParameters cannot be null!");
 
-    Supplier<String> baseClientNotNull = () -> "BaseClient cannot be null!";
+    Lazy<String> baseClientNotNull = Lazy.of(() -> "BaseClient cannot be null!");
 
-    Supplier<String> uriNotNull = () -> "URI cannot be null!";
+    Lazy<String> uriNotNull = Lazy.of(() -> "URI cannot be null!");
 
-    Supplier<String> objectMapType= () -> "Objeto tem que ser do tipo Map";
+    Lazy<String> objectMapType= Lazy.of(() -> "Objeto tem que ser do tipo Map");
 
-    Supplier<String> objectConstructError = () -> "Error on construct the Object";
+    Lazy<String> objectConstructError = Lazy.of(() -> "Error on construct the Object");
 
-    Supplier<String> nonParameters = () -> "No Parameters found";
+    Lazy<String> nonParameters = Lazy.of(() -> "No Parameters found");
 
-    Supplier<String> matchPathPars = () -> "Path Parameters do not match";
+    Lazy<String> matchPathPars = Lazy.of(() -> "Path Parameters do not match");
 
-    Supplier<String> matchQueryPars = () -> "Query Parameters do not match";
+    Lazy<String> matchQueryPars = Lazy.of(() -> "Query Parameters do not match");
 
-    Supplier<String> matchHeaders = () -> "Headers do not match";
+    Lazy<String> matchHeaders = Lazy.of(() -> "Headers do not match");
 
-    Supplier<String> endpointFormatError = () -> "Endpoint on wrong format";
+    Lazy<String> endpointFormatError = Lazy.of(() -> "Endpoint on wrong format");
 
-    Supplier<String> loadFileError = () -> "Error on loading file";
+    Lazy<String> loadFileError = Lazy.of(() -> "Error on loading file");
 
-    Supplier<String> requestMethodNotNull = () -> "Request Method can not be null!";
+    Lazy<String> requestMethodNotNull = Lazy.of(() -> "Request Method can not be null!");
 
 
 }

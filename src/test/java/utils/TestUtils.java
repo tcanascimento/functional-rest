@@ -1,6 +1,7 @@
 package utils;
 
 import base.RestSpecs;
+import io.vavr.Lazy;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 
 import java.util.Arrays;
@@ -9,22 +10,19 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
 
 public interface TestUtils {
 
-    Supplier<String> configSync =  () -> "src/test/resources/sync-get.conf";
+    Lazy<String> configSync =  Lazy.of(() -> "src/test/resources/sync-get.conf");
 
-    Supplier<String> configFile = () -> "src/test/resources/modelo.conf";
+    Lazy<String> configFile = Lazy.of(() -> "src/test/resources/modelo.conf");
 
-    Supplier<String> httpBinBaseURL = () -> "https://httpbin.org";
+    Lazy<String> httpBinBaseURL = Lazy.of(() -> "https://httpbin.org");
 
-    Supplier<String> googleBaseURL = () -> "http://www.google.com";
+    Lazy<String> googleBaseURL = Lazy.of(() -> "http://www.google.com");
 
-    Supplier<Map<String,Object>> headers = () -> Map.of("Content-Type", "application/json");
+    Lazy<Map<String,Object>> headers = Lazy.of(() -> Map.of("Content-Type", "application/json"));
 
     BiPredicate<List<String>, List<String>> equalsList = (list, list2) ->
             list2.containsAll(list);

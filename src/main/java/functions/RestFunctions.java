@@ -16,9 +16,13 @@ import static io.vavr.API.Right;
 
 public interface RestFunctions {
 
-    BiFunction<HttpRequest, RestSpecs, HttpResponse> syncHttpRequest = (request, specs) ->
-            Try.of(() -> specs.getBaseClient().send(request, specs.getResponseBodyHandler()))
-                    .get();
+    BiFunction<HttpRequest, RestSpecs, Either<String, HttpResponse>> syncHttpRequest = (request, specs) -> {
+        try {
+            return Right(specs.getBaseClient().send(request, specs.getResponseBodyHandler()));
+        } catch (IOException | InterruptedException e) {
+            return Left(e.getMessage());
+        }
+    };
 
     BiFunction<HttpRequest, RestSpecs, CompletableFuture<HttpResponse>> asyncHttpRequest = (request, specs) ->
             specs.getBaseClient().sendAsync(request,

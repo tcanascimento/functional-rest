@@ -6,6 +6,7 @@ import functions.BaseUtils;
 import functions.Helpers;
 import functions.HttpFunctions;
 import functions.RestFunctions;
+import io.vavr.Lazy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -20,14 +21,13 @@ import utils.TestUtils;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class SampleTest implements RestFunctions, Helpers, HttpFunctions, BaseUtils, MessageSupplier, TestUtils {
 
-    private Supplier<Map<String, Object>> headers = () -> Map.of("Content-Type", "application/json");
+    private Lazy<Map<String, Object>> headers = Lazy.of(() -> Map.of("Content-Type", "application/json"));
 
     @Test
     void asyncSampleTest() {
@@ -35,7 +35,7 @@ class SampleTest implements RestFunctions, Helpers, HttpFunctions, BaseUtils, Me
         var specs = new RestSpecs(httpBinBaseURL.get().concat("/get"), headers.get(), "", "get");
         var response = asyncRequest.apply(specs);
 
-        assertAll( "Validação básica",
+        assertAll( "Simple validation",
                 () -> assertNotNull(response.get().body()),
                 () -> assertEquals(200, response.get().statusCode()));
 
@@ -48,7 +48,7 @@ class SampleTest implements RestFunctions, Helpers, HttpFunctions, BaseUtils, Me
         var response = syncRequest.apply(specs).get();
         var body = new ObjectMapper().readValue(response.body().toString(), ResponseObject.class);
 
-        assertAll( "Validação básica",
+        assertAll( "Simple validation",
                 () -> assertNotNull(response.body()),
                 () -> assertEquals(200, response.statusCode()),
                 () -> assertEquals(specs.getBaseUrl().toString(), body.getUrl()));
@@ -64,7 +64,7 @@ class SampleTest implements RestFunctions, Helpers, HttpFunctions, BaseUtils, Me
 
         var specs = specsFromFile.apply(configSync.get());
         var response = asyncRequest.apply(specs);
-        assertAll( "Validação básica",
+        assertAll( "Simple validation",
                 () -> assertNotNull(response.get().body()),
                 () -> assertEquals(200, response.get().statusCode()));
     }

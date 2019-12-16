@@ -134,11 +134,7 @@ public final class RestSpecs implements BaseUtils {
     }
 
     private void setBody(String requestBody) {
-        if (requestBody.endsWith(".json")) {
-            setBody(Path.of(requestBody));
-        } else {
-            this.body = HttpRequest.BodyPublishers.ofString(requestBody);
-        }
+        if (requestBody.endsWith(".json")) setBody(Path.of(requestBody)); else this.body = HttpRequest.BodyPublishers.ofString(requestBody);
     }
 
     public void setBody(byte[] body){

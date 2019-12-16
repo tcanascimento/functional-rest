@@ -2,18 +2,18 @@ package functions;
 
 import base.RestSpecs;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vavr.Lazy;
 import io.vavr.control.Try;
 
 import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 public interface Helpers {
 
-    Supplier<String> errorMessage = () -> "POJO's ERROR - verify it!";
+    Lazy<String> errorMessage = Lazy.of(() -> "ERROR on de-serialization- verify it!");
 
     BiFunction<Map<String,Object>, RestSpecs, RestSpecs> updatePathParams = (pathParams, specs) ->
             new RestSpecs(specs.getBaseUrl().toString(),
@@ -38,17 +38,17 @@ public interface Helpers {
 
     Function<Object, String> clazzToJson = object ->
             Try.of(() -> new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object))
-                    .get();
+                    .getOrElse(errorMessage.get());
 
-    BiFunction<String, Class, Object> stringToObject = (lancamento, clazz) ->
-            Try.of(() -> new ObjectMapper().readValue(lancamento, clazz))
-                    .get();
+    BiFunction<String, Class, Object> stringToObject = (str, clazz) ->
+            Try.of(() -> new ObjectMapper().readValue(str, clazz))
+                    .getOrElse(errorMessage.get());
 
     BiFunction<HttpResponse, Class, Object> responseToClass = (response, clazz) ->
-            Try.of(() -> new ObjectMapper().readValue(response.body().toString(), clazz)).getOrElse(errorMessage);
+            Try.of(() -> new ObjectMapper().readValue(response.body().toString(), clazz)).getOrElse(errorMessage.get());
 
 
     BiFunction<String, Class, Object> responseBodyToClass = (body, clazz) ->
-            Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrElse(errorMessage);
+            Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrElse(errorMessage.get());
 
 }
