@@ -16,6 +16,9 @@ import static io.vavr.API.Right;
 
 public interface RestFunctions {
 
+    BiFunction<RestSpecs, HttpResponse.BodyHandler, CompletableFuture<HttpResponse>> asyncWithBodyHandler = (specs, handler) ->
+            specs.getBaseClient().sendAsync(specs.getRequestMethod(), handler);
+
     BiFunction<HttpRequest, RestSpecs, Either<String, HttpResponse>> syncHttpRequest = (request, specs) -> {
         try {
             return Right(specs.getBaseClient().send(request, specs.getResponseBodyHandler()));
