@@ -79,6 +79,7 @@ public final class RestSpecs implements BaseUtils {
                 Case($('s'), HttpResponse.BodyHandlers.ofString()),
                 Case($('i'), HttpResponse.BodyHandlers.ofInputStream()),
                 Case($('b'), HttpResponse.BodyHandlers.ofByteArray()),
+//                Case($('l'), HttpResponse.BodyHandlers.fromLineSubscriber(Subscriber<String>)),
                 Case($(), (Supplier<HttpResponse.BodyHandler<String>>) HttpResponse.BodyHandlers::ofString));
     }
 
@@ -237,7 +238,7 @@ public final class RestSpecs implements BaseUtils {
      */
     private String setQueryParams(String endpoint, Map<String, Object> queryPars){
         this.queryParams = queryPars;
-        return (queryPars == null || queryPars.size() < 2) ? endpoint : queryParametersComposition.apply(endpoint, queryPars);
+        return (queryPars == null || queryPars.isEmpty()) ? endpoint : queryParametersComposition.apply(endpoint, queryPars);
     }
 
     private void buildBaseClient() {

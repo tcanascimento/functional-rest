@@ -1,6 +1,6 @@
 ext {
-    jupiter_version='5.5.1'
-    alter_version='1.5.1'
+    jupiter_version='5.5.2'
+    alter_version='1.5.2'
 }
 
 dependencies {

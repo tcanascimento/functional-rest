@@ -1,5 +1,7 @@
 package functions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vavr.control.Try;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -7,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import pojo.ResponseObject;
+import pojo.temp.ResponseTemp;
 import utils.MessageSupplier;
 import utils.TestUtils;
 
@@ -28,14 +31,17 @@ class FunctionsTest implements Helpers, RestFunctions, BaseUtils, MessageSupplie
 
         var response = asyncRequest.apply(specs);
 
+        System.out.println(response.get().body());
+
         assumeTrue(response.get().statusCode() >= data.getInteger(2), statusCode200.get());
 
-        var responseObject = (ResponseObject) responseToClass.apply(response.get(), ResponseObject.class);
+        var responseObject = Try.of(() -> new ObjectMapper().readValue(response.get().body().toString(), ResponseObject.class)).get();
 
-        response.join().request();
+        System.out.println(responseObject.toString());
 
         assertAll(
-                () -> assertNotNull(response.get().body(), notNull.get()),
+                () -> assertNotNull(response.get().body(), notNull.get())
+                ,
                 () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectContentEquals.get()));
 
     }
@@ -52,7 +58,7 @@ class FunctionsTest implements Helpers, RestFunctions, BaseUtils, MessageSupplie
 
         assumeTrue(response.statusCode() >= data.getInteger(2), statusCode200.get());
 
-        var responseObject = (ResponseObject) responseToClass.apply(response, ResponseObject.class);
+        var responseObject = (ResponseTemp) responseToClass.apply(response, ResponseTemp.class);
 
         assertAll(
                 () -> assertNotNull(response.body(), notNull.get()),

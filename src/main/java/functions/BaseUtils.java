@@ -10,6 +10,7 @@ import base.RestSpecsBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
 import com.typesafe.config.ConfigFactory;
+import io.vavr.control.Try;
 
 import java.io.File;
 import java.util.*;

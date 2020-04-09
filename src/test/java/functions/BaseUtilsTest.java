@@ -21,7 +21,7 @@ class BaseUtilsTest implements BaseUtils, TestUtils, MessageSupplier, Helpers {
     private Lazy<String> baseURL = Lazy.of(() -> "https://www.gateway-empresa.com");
     private Lazy<String> endpoint = Lazy.of(() -> "/rels/{cnpj}/something/lanc/{conta}");
     private Lazy<Map<String, Object>> headers = Lazy.of(() -> Map.of("Content-Type", "application/x-www-form-urlencoded", "client_id", "CLIENTE_ID", "access_token", "QzBOdMOhQjFsLUMwcjMtQjRDay1UMGszbgo="));
-    private Lazy<Map<String, Object>> queryPars = Lazy.of(() -> Map.of( "mesInicial", 1, "ano", 2019,"mesFinal", 12));
+    private Lazy<Map<String, Object>> queryPars = Lazy.of(() -> Map.of( "mesInicial", 1, "ano", 2019,"mesFinal", 12 )); //
     private Lazy<Map<String, Object>> pathPars =  Lazy.of(() -> Map.of("cnpj","12312312312312", "conta", "2.01.01.01.10"));
 
     @Test

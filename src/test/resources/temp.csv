@@ -1,0 +1,4 @@
+funcionalidade,account,specs,amount,cashinType
+cashin,"{""accountNumber"": ""123456789"",""accountType"":""1"",""bankBranch"":""101""}","{""scene"": ""ok"",""returnCode"":""200"",""errorCode"":""none"", ""message"":""[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}""}",1,CASHIN
+cashin,"{""accountNumber"": ""123456789"",""accountType"":""1"",""bankBranch"":""101""}","{""scene"": ""cashinType faltante ou preenchido incorretamente"",""returnCode"":""400"",""errorCode"":""COR-0013"", ""message"":""none""}",10,CASHIN
+cashin,"{""accountNumber"": ""123456789"",""accountType"":""666"",""bankBranch"":""101""}","{""scene"": ""accountType incorreto ou nulo"",""returnCode"":""500"",""errorCode"":""GEN0002"", ""message"":""none""}",211,CASHBACK
