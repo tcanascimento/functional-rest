@@ -1,38 +1,46 @@
 package base;
 
-import functions.AsyncFunctions;
 import functions.BaseUtils;
+import functions.Helpers;
 import functions.HttpFunctions;
-import functions.SyncFunctions;
-import org.junit.jupiter.api.Disabled;
+import functions.RestFunctions;
+import io.vavr.Lazy;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import pojo.ResponseObject;
+import utils.MessageSupplier;
 import utils.TestUtils;
 
-import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Tag("specs")
-class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFunctions, TestUtils {
+class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions, TestUtils, MessageSupplier {
 
     @Tag("builder")
     @Test
     void specsBuilderWithTwoParametersTest(){
 
         var specs2 = new RestSpecsBuilder().with(
-                ($) -> {
-                    $.baseUrl2 = baseURL.get();
+                $ -> {
+                    $.baseUrl2 = googleBaseURL.get();
                     $.headersParams = headers.get();
                     $.bodyString = "";
+                    $.requestMethod = "get";
                 }).createSpecs();
 
         assertAll("Just BaseURL and Headers from Builder",
                 () -> assertNotNull(specs2),
-                () -> assertTrue(specs2.getURI().toString().equalsIgnoreCase(baseURL.get())),
+                () -> assertTrue(specs2.getURI().toString().equalsIgnoreCase(googleBaseURL.get())),
                 () -> assertEquals(2, specs2.getHeaders().length));
 
     }
@@ -43,71 +51,91 @@ class RestSpecsTest implements AsyncFunctions, BaseUtils, HttpFunctions, SyncFun
 
         var specs = specsFromFile.apply(configFile.get());
 
+
         assertAll("Load Specs from Config File",
-                () -> assertNotNull(specs, "Specs cannot be null!"),
-                () -> assertNotNull(specs.getBaseUrl(), "BaseURL cannot be null!"),
-                () -> assertNotNull(specs.getRawEndpoint(), "Raw endpoint cannot be null!"),
-                () -> assertNotNull(specs.getFormatedEndpoint(), "Formated endpoint cannot be null"),
-                () -> assertNotNull(specs.getHeaders(), "Headers cannot be null!"),
-                () -> assertNotNull(specs.getPathParams(), "PathParameters cannot be null!"),
-                () -> assertNotNull(specs.getQueryParams(), "QueryParameters cannot be null!"),
-                () -> assertNotNull(specs.getBaseClient(), "BaseClient cannot be null!"),
-                () -> assertNotNull(specs.getURI(), "URI cannot be null!")
+                () -> assertNotNull(specs, specsNotNull.get()),
+                () -> assertNotNull(specs.getBaseUrl(), baseURLNotNull.get()),
+                () -> assertNotNull(specs.getRawEndpoint(), rawEndpointNotNull.get()),
+                () -> assertNotNull(specs.getFormatedEndpoint(), formatedEndpointNotNull.get()),
+                () -> assertNotNull(specs.getHeaders(), headersNotNull.get()),
+                () -> assertNotNull(specs.getPathParams(), pathParametersNotNull.get()),
+                () -> assertNotNull(specs.getQueryParams(), queryParametersNotNull.get()),
+                () -> assertNotNull(specs.getBaseClient(), baseClientNotNull.get()),
+                () -> assertNotNull(specs.getRawRequestMethod(), requestMethodNotNull.get()),
+                () -> assertTrue(specs.getRawRequestMethod().equalsIgnoreCase( "PUT"), requestMethodNotNull.get()),
+                () -> assertNotNull(specs.getURI(), uriNotNull.get())
         );
+
+        System.out.println("Method: " +specs.getRequestMethod().toString());
 
     }
 
 
     @Tag("specs-simple")
     @Test
-    void specsConstructorSimpleTest() throws ExecutionException, InterruptedException {
+    void specsConstructorSimpleTest() {
 
-        var specs = new RestSpecs(baseURL.get(), headers.get(), "");
+        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "", "get");
 
         assertAll("Just BaseURL, Headers and empty body for Constructor",
-                () -> assertNotNull(specs, "Specs cannot be null!"),
-                () -> assertNotNull(specs.getBaseUrl(), "BaseURL cannot be null!"),
-                () -> assertNotNull(specs.getHeaders(), "Headers cannot be null!"),
-                () -> assertNotNull(specs.getBaseClient(), "BaseClient cannot be null!"),
-                () -> assertNotNull(specs.getURI(), "URI cannot be null!")
-        );
-
-//        System.out.println(asyncRequestGET.apply(specs).body());
-
-//        var response = syncRequestGET.apply(specs).get();
-        /*var body = response.peek(HttpResponse::body);
-        Option<Object> status = response.map(HttpResponse::statusCode);*
-
-        /*System.out.println(body);
-        System.out.println(status);*/
-
-        var response = asyncRequestGET.apply(specs);
-
-        System.out.println("Status Code: "+ response.thenApply(HttpResponse::statusCode).get());
-        System.out.println("Body: " + response.get().body());
-        System.out.println("Headers: " + response.get().headers());
-
-        System.out.println("\nHttpResponse: " + response.get());
+                () -> assertNotNull(specs, specsNotNull.get()),
+                () -> assertNotNull(specs.getBaseUrl(), baseURLNotNull.get()),
+                () -> assertNotNull(specs.getHeaders(), headersNotNull.get()),
+                () -> assertNotNull(specs.getBaseClient(), baseClientNotNull.get()),
+                () -> assertNotNull(specs.getURI(), uriNotNull.get()));
 
     }
 
-
-    @Disabled
+    @Tag("method-exception")
     @Test
-    void nada(){
-//        var url = "http://localhost:8080/uat/sso/oauth/token?grant_type=password&username=superadmin&password=erebus";
+    void specsConstructorExceptionTest() {
 
-        var url = "http://www.google.com";
+        var exceptionMsg = "you should specify a request method!"; //"baseURL cannot be empty!";
 
-        var specs2 = new RestSpecsBuilder().with(
-                ($) -> {
-                    $.baseUrl2 = url;
-                    $.headersParams = headers.get();
-                }).createSpecs();
+        var exception = assertThrows(AssertionError.class, () -> new RestSpecs(googleBaseURL.get(), headers.get(), "", ""));
+        var exceptionFullConstructor = assertThrows(AssertionError.class, () -> new RestSpecs(
+                googleBaseURL.get(), "", headers.get(), Map.of(), Map.of(), "", ""
+        ));
 
-        var response = syncRequestPost.apply(specs2);
+        assertAll("Raising exception for request method empty String",
+                () -> assertEquals(exceptionFullConstructor.getMessage(), exceptionMsg),
+                () -> assertEquals(exception.getMessage(), exceptionMsg));
 
-        System.out.println(response.body());
+    }
+
+    @Tag("baseURL-exception")
+    @Test
+    void specsBaseURLExceptionTest() {
+
+        var exceptionMsg = "baseURL cannot be empty!";
+        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "", "GET");
+        var exception = assertThrows(AssertionError.class, () -> specs.setBaseUrl(""));
+
+        assertAll("Raising exception for baseURL empty String",
+                () -> assertEquals(exception.getMessage(), exceptionMsg));
+
+    }
+
+    @Tags({@Tag("specs")})
+    @DisplayName(value = "Rest Specs Method")
+    @ParameterizedTest(name = "Async sample Http test {index} with [{arguments}]")
+    @CsvFileSource(resources = "/sync-data.csv", numLinesToSkip = 1)
+    void syncTest(ArgumentsAccessor data) throws ExecutionException, InterruptedException {
+
+        var specs = updateRestSpecs.apply(data,specsFromFile.apply(configSync.get()));
+
+        var response = asyncRequest.apply(specs);
+
+        assumeTrue(response.get().statusCode() >= data.getInteger(2), statusCode200.get());
+
+        response.join().request();
+
+        var responseObject = (ResponseObject) responseToClass.apply(response.get(), ResponseObject.class);
+
+        assertAll(
+                () -> assertNotNull(response.get().body(), notNull.get()),
+                () -> assertTrue(specs.getRawRequestMethod().equalsIgnoreCase(data.getString(1)), objectContentEquals.get()),
+                () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectContentEquals.get()));
 
     }
 

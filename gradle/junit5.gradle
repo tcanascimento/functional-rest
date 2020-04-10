@@ -1,27 +1,18 @@
 ext {
-    jupiter_version='5.5.0-RC2'
-    alter_version='1.5.0-RC2'
+    jupiter_version='5.6.1'
+    alter_version='1.6.1'
 }
 
 dependencies {
 
-    /*implementation group: 'org.junit.jupiter', name: 'junit-jupiter-migrationsupport', version: "${jupiter_version}"
-    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${jupiter_version}"
-    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: "${jupiter_version}"
-    implementation group: 'org.junit.platform', name: 'junit-platform-console', version: "${alter_version}"
-    implementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${alter_version}"
-    implementation group: 'org.junit.platform', name: 'junit-platform-runner', version: "${alter_version}"
-    implementation group: 'org.junit.platform', name: 'junit-platform-commons', version: "${alter_version}"*/
-
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${jupiter_version}"
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-migrationsupport', version: "${jupiter_version}"
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${jupiter_version}"
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: "${jupiter_version}"
-    testImplementation group: 'org.junit.platform', name: 'junit-platform-console', version: "${alter_version}"
-    testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${alter_version}"
-    testImplementation group: 'org.junit.platform', name: 'junit-platform-runner', version: "${alter_version}"
-
-//    testImplementation "org.testcontainers:junit-jupiter:1.11.3"
+    implementation(
+            'org.junit.jupiter:junit-jupiter-migrationsupport:'+"${jupiter_version}",
+            'org.junit.jupiter:junit-jupiter-engine:'+"${jupiter_version}",
+            'org.junit.jupiter:junit-jupiter-params:'+"${jupiter_version}",
+            'org.junit.platform:junit-platform-console:'+"${alter_version}",
+            'org.junit.platform:junit-platform-launcher:'+"${alter_version}",
+            'org.junit.platform:junit-platform-runner:'+"${alter_version}",
+            'org.junit.platform:junit-platform-commons:'+"${alter_version}")
 
 }
 
@@ -29,7 +20,7 @@ dependencies {
 test {
 
     description = 'Executa testes. Para executar tags específicas, use: gradle clean test -Dtag="tag".'
-
+    testLogging.showStandardStreams = true
     String tag = System.properties.getProperty("tag")
     systemProperties = [
             'junit.jupiter.extensions.autodetection.enabled': 'true',
@@ -57,5 +48,10 @@ test {
                     "${result.skippedTestCount} skipped"
         }
     }
+
+    /* jacoco {
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpDir = file("$buildDir/jacoco/classpathdumps")
+    } */
 
 }

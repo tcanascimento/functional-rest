@@ -6,6 +6,7 @@ package base;
  */
 
 import functions.BaseUtils;
+import io.vavr.API;
 import io.vavr.control.Try;
 
 import java.net.Authenticator;
@@ -17,9 +18,13 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-public class RestSpecs implements BaseUtils {
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+
+public final class RestSpecs implements BaseUtils {
 
     private static final Logger LOG = Logger.getLogger(RestSpecs.class.getName());
 
@@ -36,22 +41,28 @@ public class RestSpecs implements BaseUtils {
     private HttpClient baseClient;
     private URI uri;
 
+    private String requestMethod;
 
-    public RestSpecs(String baseUrl, Map<String, Object> headersParams, String body){
+
+    public RestSpecs(String baseUrl, Map<String, Object> headersParams, String body, String requestMethod){
         this.baseUrl = URI.create(baseUrl);
         this.uri = URI.create(baseUrl);
         this.headers = headersParams;
+        assert(!requestMethod.isBlank()): "you should specify a request method!";
+        this.requestMethod = requestMethod;
         if(body != null) setBody(body); else setBody("");
     }
 
     public RestSpecs(String baseUrl, String endp, Map<String, Object> headersParams, Map<String, Object> queryParams,
-                     Map<String, Object> pathParams, String body) {
+                     Map<String, Object> pathParams, String body, String requestMethod) {
         this.baseUrl = URI.create(baseUrl);
         this.headers = headersParams;
         this.endpoint = endp;
         var tempEndpoint = this.endpoint;
         this.pathParams = pathParams;
         this.queryParams = queryParams;
+        assert(!requestMethod.isBlank()): "you should specify a request method!";
+        this.requestMethod = requestMethod;
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         if(getRawEndpoint() != null && !getRawEndpoint().isBlank()) tempEndpoint = setQueryParams(tempEndpoint, queryParams);
         if(getRawEndpoint() != null) setURI(baseUrl, tempEndpoint); else this.uri = URI.create(baseUrl);
@@ -63,12 +74,12 @@ public class RestSpecs implements BaseUtils {
     }
 
     public HttpResponse.BodyHandler getResponseBodyHandler(){
-        switch (responseHandlerType){
-            case 's': return HttpResponse.BodyHandlers.ofString();
-            case 'i': return HttpResponse.BodyHandlers.ofInputStream();
-            case 'b': return HttpResponse.BodyHandlers.ofByteArray();
-            default: return HttpResponse.BodyHandlers.ofString();
-        }
+        return API.Match(this.responseHandlerType).of(
+                Case($('s'), HttpResponse.BodyHandlers.ofString()),
+                Case($('i'), HttpResponse.BodyHandlers.ofInputStream()),
+                Case($('b'), HttpResponse.BodyHandlers.ofByteArray()),
+//                Case($('l'), HttpResponse.BodyHandlers.fromLineSubscriber(Subscriber<String>)),
+                Case($(), (Supplier<HttpResponse.BodyHandler<String>>) HttpResponse.BodyHandlers::ofString));
     }
 
     public char getResponseHandlerType() {
@@ -83,10 +94,9 @@ public class RestSpecs implements BaseUtils {
         this.responseHandlerType = responseHandlerType;
     }
 
-    //todo: test it!
-    public void setBaseUrl(String baseUrl) {
-        assert baseUrl.isBlank(): "baseURL cannot be empty!";
-        this.baseUrl = URI.create(baseUrl);
+    public void setBaseUrl(String url) {
+        assert(!url.isBlank()): "baseURL cannot be empty!";
+        this.baseUrl = URI.create(url);
     }
 
     public URI getURI() {
@@ -119,13 +129,12 @@ public class RestSpecs implements BaseUtils {
         this.body = HttpRequest.BodyPublishers.noBody();
     }
 
+    public void setRequestMethod(String method){
+        this.requestMethod = method;
+    }
 
-    public void setBody(String requestBody) {
-        if (requestBody.endsWith(".json")) {
-            setBody(Path.of(requestBody));
-        } else {
-            this.body = HttpRequest.BodyPublishers.ofString(requestBody);
-        }
+    private void setBody(String requestBody) {
+        if (requestBody.endsWith(".json")) setBody(Path.of(requestBody)); else this.body = HttpRequest.BodyPublishers.ofString(requestBody);
     }
 
     public void setBody(byte[] body){
@@ -135,7 +144,7 @@ public class RestSpecs implements BaseUtils {
     /**
      * @param filePathBody
      */
-    public void setBody(Path filePathBody){
+    private void setBody(Path filePathBody){
         Try.of(()-> this.body = HttpRequest.BodyPublishers.ofFile(filePathBody))
                 .onFailure(throwable -> LOG.severe(throwable.toString()));
     }
@@ -182,8 +191,7 @@ public class RestSpecs implements BaseUtils {
     }
 
     public String getFormatedEndpoint(){
-        var tempEndpoint = this.endpoint;
-        tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
+        var tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         tempEndpoint = setQueryParams(tempEndpoint, queryParams);
         return tempEndpoint;
     }
@@ -193,7 +201,7 @@ public class RestSpecs implements BaseUtils {
     }
 
     private String setPathParams(Map<String, Object> pathParams, String endpoint) {
-        this.pathParams = pathParams; //todo: testar com null
+        this.pathParams = pathParams;
         return (pathParams != null && pathParams.size() % 2 == 0) ? setPathParameters.apply(endpoint, pathParams) : endpoint;
     }
 
@@ -201,31 +209,43 @@ public class RestSpecs implements BaseUtils {
         this.uri = URI.create(uri);
     }
 
+    public HttpRequest getRequestMethod(){
+        return API.Match(this.getRawRequestMethod().toUpperCase()).of(
+                Case($("GET"), baseRequestBuilder().GET().build()),
+                Case($("POST"), baseRequestBuilder().POST(this.getBody()).build()),
+                Case($("PUT"), baseRequestBuilder().PUT(this.getBody()).build()),
+                Case($("DELETE"), baseRequestBuilder().DELETE().build()));
+    }
+
+    public String getRawRequestMethod(){
+        return this.requestMethod;
+    }
+
+    private HttpRequest.Builder baseRequestBuilder(){
+        return HttpRequest
+                .newBuilder()
+                .uri(this.getURI())
+                .timeout(this.getTimeout())
+                .headers(this.getHeaders());
+    }
+
     /**
      *
      * @param endpoint
-     * @param queryParams as Map, it does not guarantee order; so, API should how to resolve parameters indepently of their order.
+     * @param queryPars as Map, it does not guarantee order; so, API should how to resolve parameters.
      * @return
      */
-    private String setQueryParams(String endpoint, Map<String, Object> queryParams){
-        this.queryParams = queryParams; //todo: testar com null
-        return (queryParams == null || queryParams.size() < 2) ? endpoint : queryParametersComposition.apply(endpoint, queryParams);
+    private String setQueryParams(String endpoint, Map<String, Object> queryPars){
+        this.queryParams = queryPars;
+        return (queryPars == null || queryPars.isEmpty()) ? endpoint : queryParametersComposition.apply(endpoint, queryPars);
     }
 
     private void buildBaseClient() {
-       if(cookieHandler != null) {
-           baseClient = HttpClient
-                   .newBuilder()
-                   .cookieHandler(cookieHandler)
-                   .connectTimeout(timeout)
-                   .build();
-       } else {
-           baseClient = HttpClient
-                   .newBuilder()
-                   .connectTimeout(timeout)
-                   .build();
-       }
+        this.baseClient = cookieHandler != null ? HttpClient.newBuilder().cookieHandler(cookieHandler)
+                .connectTimeout(timeout).build() :
+                HttpClient.newBuilder().connectTimeout(timeout).build();
     }
+
 
     @Override
     public String toString() {
@@ -237,6 +257,7 @@ public class RestSpecs implements BaseUtils {
                 ", queryParams=" + queryParams +
                 ", pathParams=" + pathParams +
                 ", body=" + body +
+                ", requestMethod=" + requestMethod +
                 ", responseHandlerType=" + responseHandlerType +
                 ", authenticator=" + authenticator +
                 ", cookieHandler=" + cookieHandler +

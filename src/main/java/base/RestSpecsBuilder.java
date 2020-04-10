@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Builder funcionarl para RestSpecs.
+ * Builder funcional para RestSpecs.
  * Exemplo de uso:
  *         RestSpecs teste = new RestSpecsBuilder().with(
  *                 $ -> {
@@ -25,10 +25,10 @@ public class RestSpecsBuilder implements BaseUtils {
     public Map<String, Object> queryParams;
     public Map<String, Object> pathParams;
     public Map<String, Object> headersParams;
-    public String[] headers;
     public String baseUrl2;
     public String endpoint2;
     public String bodyString;
+    public String requestMethod;
 
     public RestSpecsBuilder with(Consumer<RestSpecsBuilder> builderFunction) {
         builderFunction.accept(this);
@@ -36,7 +36,7 @@ public class RestSpecsBuilder implements BaseUtils {
     }
 
     public RestSpecs createSpecs(){
-        return new RestSpecs(baseUrl2, endpoint2, headersParams, queryParams, pathParams, bodyString);
+        return new RestSpecs(baseUrl2, endpoint2, headersParams, queryParams, pathParams, bodyString, requestMethod);
     }
 
 }

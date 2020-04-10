@@ -1,6 +1,7 @@
 package utils;
 
 import base.RestSpecs;
+import io.vavr.Lazy;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 
 import java.util.Arrays;
@@ -9,15 +10,19 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Supplier;
+
 
 public interface TestUtils {
 
-    Supplier<String> configFile = () -> "src/test/resources/modelo.conf";
+    Lazy<String> configSync =  Lazy.of(() -> "src/test/resources/sync-get.conf");
 
-    Supplier<String> baseURL = () -> "http://www.google.com";
+    Lazy<String> configFile = Lazy.of(() -> "src/test/resources/modelo.conf");
 
-    Supplier<Map<String,Object>> headers = () -> Map.of("Content-Type", "application/json");
+    Lazy<String> httpBinBaseURL = Lazy.of(() -> "https://httpbin.org");
+
+    Lazy<String> googleBaseURL = Lazy.of(() -> "http://www.google.com");
+
+    Lazy<Map<String,Object>> headers = Lazy.of(() -> Map.of("Content-Type", "application/json"));
 
     BiPredicate<List<String>, List<String>> equalsList = (list, list2) ->
             list2.containsAll(list);
@@ -30,9 +35,7 @@ public interface TestUtils {
 
     Function<TestSourceTemplate,List<String>> setParams = (data) ->  Arrays.asList(data.getQueryParams().replaceAll("[^a-zA-Z0-9,]","").split(","));
 
-    BiFunction<ArgumentsAccessor, RestSpecs, RestSpecs> updateRestSpecs = (data, specs) -> {
-        String endpoint = data.getString(0);
-        return new RestSpecs(specs.getBaseUrl().toString(), endpoint, specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(),"");
-    };
+    BiFunction<ArgumentsAccessor, RestSpecs, RestSpecs> updateRestSpecs = (data, specs) ->
+        new RestSpecs(specs.getBaseUrl().toString(), data.getString(0), specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(),"", data.getString(1));
 
 }
