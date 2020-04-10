@@ -1,17 +1,25 @@
 buildscript {
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
+        jcenter()
     }
     dependencies {
         classpath "eu.davidea:grabver:2.0.1"
+//        classpath 'com.bmuschko:gradle-clover-plugin:2.2.3'
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
+       classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
     }
 }
 
 plugins {
     id 'java'
+    id "org.sonarqube" version "2.7"
+    id 'jacoco'
+    id 'io.codearte.nexus-staging' version '0.11.0'
 }
 
-group 'tcanascimento'
+archivesBaseName = 'functional-rest'
+group 'com.github.tcanascimento'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 11
@@ -23,11 +31,15 @@ repositories {
     jcenter()
     maven { url "https://jitpack.io" }
     maven { url "http://dl.bintray.com/davideas/maven" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://plugins.gradle.org/m2/" }
 }
 
 apply from: 'gradle/junit5.gradle'
+// apply from: 'gradle/cyclops.gradle'
 apply plugin: "eu.davidea.grabver"
+apply plugin: 'com.bmuschko.nexus'
+//apply plugin: 'com.bmuschko.clover'
 
 configurations {
     exclusions {
@@ -36,8 +48,17 @@ configurations {
 }
 
 dependencies {
-    implementation group: 'com.github.pureconfig', name:'pureconfig-javax_2.12', version: '0.10.2'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+//     implementation group: 'com.github.pureconfig', name:'pureconfig-javax_2.12', version: '0.10.2'
+//     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+
+    implementation(
+    'com.github.pureconfig:pureconfig-javax_2.12:0.10.2',
+    'com.fasterxml.jackson.core:jackson-databind:2.9.9',
+    'com.github.jitpack:gradle-simple:1.0',
+    'org.openclover:clover:4.3.1',
+    'io.vavr:vavr:0.10.2',
+    'io.vavr:vavr-jackson:0.10.2'
+    )
 }
 
 versioning {
@@ -48,7 +69,76 @@ versioning {
     patch 7
     preRelease "RC1"
     // Optional, custom task name to trigger the increase of the version
-//    incrementOn "addVersion"
+    incrementOn "assemble"
     // Optional, custom task name for which you want to save the versioning file
-//    saveOn "saveVersion"
+    saveOn "assemble"
+}
+
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.projectName", "${project.name}"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", "${sonar-login}"
+        property "sonar.projectKey", "tcanascimento_functional-rest"
+        property "sonar.organization","tcanascimento-github"
+        property "sonar.junit.reportPaths", "${buildDir}/test-results/test"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled true
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+modifyPom {
+    project {
+        name 'Functional Rest'
+        description 'A Small Lib for API Rest Testing'
+        url 'https://github.com/tcanascimento/functional-rest'
+        inceptionYear '2019'
+
+        scm {
+            url 'https://github.com/tcanascimento/functional-rest.git'
+            connection 'scm:https://github.com/tcanascimento/functional-rest.git'
+            developerConnection 'scm:git://github.com/tcanascimento/functional-rest.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'tcanascimento'
+                name 'Thiago Carreira A. Nascimento'
+                email 'tcanascimento@gmail.com'
+            }
+        }
+    }
+}
+
+extraArchive {
+    sources = false
+    tests = true
+    javadoc = false
+}
+
+nexus {
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+}
+
+nexusStaging {
+    packageGroup = "com.github.tcanascimento" //optional if packageGroup == project.getGroup()
+    stagingProfileId = "cd98c67a221aa" //when not defined will be got from server using "packageGroup"
 }
