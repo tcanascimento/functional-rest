@@ -2,7 +2,6 @@ package functions;
 
 import base.RestSpecs;
 import io.vavr.control.Either;
-import io.vavr.control.Try;
 
 import java.io.IOException;
 import java.net.http.HttpRequest;
@@ -22,7 +21,7 @@ public interface RestFunctions {
     BiFunction<HttpRequest, RestSpecs, Either<String, HttpResponse>> syncHttpRequest = (request, specs) -> {
         try {
             return Right(specs.getBaseClient().send(request, specs.getResponseBodyHandler()));
-        } catch (IOException | InterruptedException e) {
+        } catch(IOException | InterruptedException e) {
             return Left(e.getMessage());
         }
     };

@@ -4,7 +4,6 @@ import functions.BaseUtils;
 import functions.Helpers;
 import functions.HttpFunctions;
 import functions.RestFunctions;
-import io.vavr.Lazy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -18,15 +17,15 @@ import utils.TestUtils;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
 
+import static functions.RestFunctions.asyncRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Tag("specs")
 class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions, TestUtils, MessageSupplier {
 
-    @Tag("builder")
+/*    @Tag("builder")
     @Test
     void specsBuilderWithTwoParametersTest(){
 
@@ -43,7 +42,7 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
                 () -> assertTrue(specs2.getURI().toString().equalsIgnoreCase(googleBaseURL.get())),
                 () -> assertEquals(2, specs2.getHeaders().length));
 
-    }
+    }*/
 
     @Tag("specs-from-file")
     @Test
@@ -61,9 +60,9 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
                 () -> assertNotNull(specs.getPathParams(), pathParametersNotNull.get()),
                 () -> assertNotNull(specs.getQueryParams(), queryParametersNotNull.get()),
                 () -> assertNotNull(specs.getBaseClient(), baseClientNotNull.get()),
-                () -> assertNotNull(specs.getRawRequestMethod(), requestMethodNotNull.get()),
-                () -> assertTrue(specs.getRawRequestMethod().equalsIgnoreCase( "PUT"), requestMethodNotNull.get()),
-                () -> assertNotNull(specs.getURI(), uriNotNull.get())
+                () -> assertNotNull(specs.getRequestMethod(), requestMethodNotNull.get()),
+                () -> assertTrue(specs.getRequestMethod().method().equalsIgnoreCase( "PUT"), requestMethodNotNull.get()),
+                () -> assertNotNull(specs.getUri(), uriNotNull.get())
         );
 
         System.out.println("Method: " +specs.getRequestMethod().toString());
@@ -75,14 +74,19 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
     @Test
     void specsConstructorSimpleTest() {
 
-        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "", "get");
+        //googleBaseURL.get(), headers.get(), "", "get"
+        var specs = new RestSpecs()
+                .baseURL(googleBaseURL.get())
+                .headersParams(headers.get())
+                .requestMethod("get")
+                .build();
 
         assertAll("Just BaseURL, Headers and empty body for Constructor",
                 () -> assertNotNull(specs, specsNotNull.get()),
                 () -> assertNotNull(specs.getBaseUrl(), baseURLNotNull.get()),
                 () -> assertNotNull(specs.getHeaders(), headersNotNull.get()),
                 () -> assertNotNull(specs.getBaseClient(), baseClientNotNull.get()),
-                () -> assertNotNull(specs.getURI(), uriNotNull.get()));
+                () -> assertNotNull(specs.getUri(), uriNotNull.get()));
 
     }
 
@@ -94,8 +98,7 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
 
         var exception = assertThrows(AssertionError.class, () -> new RestSpecs(googleBaseURL.get(), headers.get(), "", ""));
         var exceptionFullConstructor = assertThrows(AssertionError.class, () -> new RestSpecs(
-                googleBaseURL.get(), "", headers.get(), Map.of(), Map.of(), "", ""
-        ));
+                googleBaseURL.get(), "", headers.get(), Map.of(), Map.of(), "", ""));
 
         assertAll("Raising exception for request method empty String",
                 () -> assertEquals(exceptionFullConstructor.getMessage(), exceptionMsg),
@@ -136,6 +139,33 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
                 () -> assertNotNull(response.get().body(), notNull.get()),
                 () -> assertTrue(specs.getRawRequestMethod().equalsIgnoreCase(data.getString(1)), objectContentEquals.get()),
                 () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectContentEquals.get()));
+
+    }
+
+    @Test
+    void testSpecss(){
+        var baseUrl = "https://httpbin.org";
+        var requestMethod = "GET";
+        var endpoint = "/get/{cnpj}/{conta}";
+        var end = "/get/";
+        Map<String, Object> headers = Map.of("Content-Type", "application/x-www-form-urlencoded", "client_id", "CLIENTE_ID", "access_token", "QzBOdMOhQjFsLUMwcjMtQjRDay1UMGszbgo=");
+        Map<String, Object> queryParams = Map.of("ano", 2019, "mesInicial", 1, "mesFinal", 12);
+        Map<String, Object> pathParams = Map.of("cnpj","12312312312312", "conta", "2.01.01.01.10");
+
+        var specs = new RestSpecs()
+                .baseURL(baseUrl)
+                .requestMethod(requestMethod)
+                .endpoint(end)
+//                .queryParams(queryParams)
+//                .pathParams(pathParams)
+                .headersParams(headers)
+                .build();
+
+        System.out.println(specs.toString());
+        System.out.println(specs.getBaseClient());
+//        System.out.println(specs.getRawEndpoint());
+        System.out.println(specs.getUri());
+//        System.out.println(specs.getFormatedEndpoint());
 
     }
 

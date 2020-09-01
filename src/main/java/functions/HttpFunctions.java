@@ -5,7 +5,6 @@ package functions;
  *   license: Apache2
  */
 
-import base.RestSpecs;
 import io.vavr.API;
 
 import java.net.http.HttpRequest;

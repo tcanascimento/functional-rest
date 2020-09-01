@@ -36,7 +36,7 @@ repositories {
 
 apply from: 'gradle/junit5.gradle'
 apply from: 'gradle/vavr.gradle'
-apply from: 'gradle/cyclops.gradle'
+//apply from: 'gradle/cyclops.gradle'
 apply plugin: "eu.davidea.grabver"
 apply plugin: 'com.bmuschko.nexus'
 //apply plugin: 'com.bmuschko.clover'

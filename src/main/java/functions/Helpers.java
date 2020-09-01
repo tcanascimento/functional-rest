@@ -1,11 +1,12 @@
 package functions;
 
-import base.RestSpecs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.Lazy;
 import io.vavr.control.Try;
 
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -50,5 +51,11 @@ public interface Helpers {
 
     BiFunction<String, Class, Object> responseBodyToClass = (body, clazz) ->
             Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrElse(errorMessage.get());
+
+    Function<String, String> getConfigPath = filename -> {
+        var path = Paths.get("src", "test", "resources", filename, filename.concat(".conf"));
+        return Files.exists(path) ? path.toString() : "no dir found for " + filename;
+    };
+
 
 }

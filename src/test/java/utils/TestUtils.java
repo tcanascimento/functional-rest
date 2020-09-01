@@ -1,6 +1,5 @@
 package utils;
 
-import base.RestSpecs;
 import io.vavr.Lazy;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 

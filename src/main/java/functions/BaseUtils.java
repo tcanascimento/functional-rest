@@ -6,17 +6,21 @@ package functions;
  */
 
 import base.RestSpecs;
-import base.RestSpecsBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
 import com.typesafe.config.ConfigFactory;
 import io.vavr.control.Try;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public interface BaseUtils {
@@ -31,16 +35,15 @@ public interface BaseUtils {
 
     Function<String, RestSpecs> specsFromFile = file -> {
         Config config = ConfigFactory.parseFile(new File(file)).resolve();
-        return new RestSpecsBuilder().with(
-                ($) -> {
-                    $.baseUrl2 = config.getConfig("specs").getString("baseUrl");
-                    $.endpoint2 = config.getConfig("specs").getString("endpoint");
-                    $.headersParams = config.getConfig("specs").getObject("headers").unwrapped();
-                    $.queryParams = config.getConfig("specs").getObject("queryParams").unwrapped();
-                    $.pathParams = config.getConfig("specs").getObject("pathParams").unwrapped();
-                    $.bodyString = config.getConfig("specs").getString("body");
-                    $.requestMethod = config.getConfig("specs").getString("requestMethod");
-                }).createSpecs();
+        return new RestSpecs()
+                .baseURL(config.getConfig("specs").getString("baseUrl"))
+                .endpoint(config.getConfig("specs").getString("endpoint"))
+                .headersParams(config.getConfig("specs").getObject("headers").unwrapped())
+                .queryParams(config.getConfig("specs").getObject("queryParams").unwrapped())
+                .pathParams(config.getConfig("specs").getObject("pathParams").unwrapped())
+                .body(config.getConfig("specs").getString("body"))
+                .requestMethod(config.getConfig("specs").getString("requestMethod"))
+                .build();
     };
 
     //todo: refactor
@@ -50,8 +53,6 @@ public interface BaseUtils {
                 .forEach(k -> pathParameter.lazySet(pathParameter.get().replaceFirst("\\{".concat(k).concat("\\}"), pars.get(k).toString())));
         return pathParameter.get();
     };
-
-
 
 
     Function<Map<String,Object>, String[]> mapToStringArray = map -> {
@@ -85,5 +86,35 @@ public interface BaseUtils {
                     .map(s -> s.split(":"))
                     .collect(Collectors.toMap(k -> k[0].strip(), k -> k[1].strip()));
 
+
+        /*
+    Exemplo de uso:
+        Function3<RestSpecs, Supplier<TrustManager[]>, Function<TrustManager[], SSLContext>, RestSpecs> updateClientSpecs = (specs, supplier, ssl) -> {
+        specs.setBaseClient(HttpClient.newBuilder()
+                .sslContext(ssl.apply(supplier.get()))
+                .build());
+        return specs;
+    };
+     */
+
+    Supplier<TrustManager[]> trustAllCerts = () -> new TrustManager[] {
+            new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
+    };
+
+    Function<TrustManager[], SSLContext> sslContext = trustManager -> {
+        SSLContext sc = Try.of(() -> SSLContext.getInstance("SSL")).get();
+        Try.run(() -> sc.init(null, trustManager, new java.security.SecureRandom())).get();
+        return sc;
+    };
 
 }

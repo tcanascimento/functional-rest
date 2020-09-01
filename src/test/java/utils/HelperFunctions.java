@@ -1,6 +1,5 @@
 package utils;
 
-import base.RestSpecs;
 import functions.HttpFunctions;
 import io.vavr.API;
 
