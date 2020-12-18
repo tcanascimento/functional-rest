@@ -96,6 +96,11 @@ public final class RestSpecs {
         return this;
     }
 
+    public RestSpecs body(HttpRequest.BodyPublisher body){
+        this.body = body;
+        return this;
+    }
+
     public RestSpecs endpoint(String endpoint){
         this.endpoint = endpoint;
         return this;
@@ -144,15 +149,16 @@ public final class RestSpecs {
         return mapToStringArray.apply(headers);
     }
 
+    public Map<String, Object> getHeadersMap(){
+        return headers;
+    }
+
     public String getFormatedEndpoint(){
         var tempEndpoint = setPathParameters.apply(this.endpoint, pathParams);
         tempEndpoint = setQueryParams(tempEndpoint, queryParams);
         return tempEndpoint;
     }
 
-    public static Logger getLOG() {
-        return LOG;
-    }
 
     public URI getBaseUrl() {
         return baseUrl;

@@ -3,20 +3,20 @@ package base;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
 
-class Finder implements Flow.Subscriber<String> {
+class FlowFilter implements Flow.Subscriber<String> {
 
     private final CompletableFuture<Boolean> found;
 
     private final String term;
     private Flow.Subscription subscription;
 
-    public Finder(String term, CompletableFuture<Boolean> future){
+    public FlowFilter(String term, CompletableFuture<Boolean> future){
         this.term = term;
         this.found = future;
     }
 
 
-    public Finder(String term) {
+    public FlowFilter(String term) {
         this.term = term;
         this.found = new CompletableFuture<>();
     }

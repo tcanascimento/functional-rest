@@ -1,5 +1,6 @@
 package functions;
 
+import base.RestSpecs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.Lazy;
 import io.vavr.control.Try;
@@ -17,24 +18,53 @@ public interface Helpers {
     Lazy<String> errorMessage = Lazy.of(() -> "ERROR on de-serialization- verify it!");
 
     BiFunction<Map<String,Object>, RestSpecs, RestSpecs> updatePathParams = (pathParams, specs) ->
-            new RestSpecs(specs.getBaseUrl().toString(),
-                    specs.getRawEndpoint(),
-                    specs.getHeadersMap(),
-                    specs.getQueryParams(),
-                    pathParams, specs.getBody().toString(), specs.getRawRequestMethod());
+            new RestSpecs()
+                    .baseURL(specs.getBaseUrl().toString())
+                    .endpoint(specs.getRawEndpoint())
+                    .headersParams(specs.getHeadersMap())
+                    .pathParams(pathParams)
+                    .queryParams(specs.getQueryParams())
+                    .body(specs.getBody())
+                    .baseClient(specs.getBaseClient())
+                    .requestMethod(specs.getRequestMethod().method())
+                    .build();
+
 
     BiFunction<Map<String,Object>, RestSpecs, RestSpecs> updateQueryParams = (queryParams, specs) ->
-            new RestSpecs(specs.getBaseUrl().toString(),
-                    specs.getRawEndpoint(),
-                    specs.getHeadersMap(),
-                    queryParams,
-                    specs.getPathParams(), specs.getBody().toString(), specs.getRawRequestMethod());
+            new RestSpecs()
+                    .baseURL(specs.getBaseUrl().toString())
+                    .endpoint(specs.getRawEndpoint())
+                    .headersParams(specs.getHeadersMap())
+                    .pathParams(specs.getPathParams())
+                    .queryParams(queryParams)
+                    .body(specs.getBody())
+                    .baseClient(specs.getBaseClient())
+                    .requestMethod(specs.getRequestMethod().method())
+                    .build();
 
     BiFunction<String, RestSpecs, RestSpecs> updateEndpoint = (endpoint, specs) ->
-            new RestSpecs(specs.getBaseUrl().toString(), endpoint, specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(), specs.getBody().toString(), specs.getRawRequestMethod());
+            new RestSpecs()
+                    .baseURL(specs.getBaseUrl().toString())
+                    .endpoint(endpoint)
+                    .headersParams(specs.getHeadersMap())
+                    .pathParams(specs.getPathParams())
+                    .queryParams(specs.getQueryParams())
+                    .body(specs.getBody())
+                    .baseClient(specs.getBaseClient())
+                    .requestMethod(specs.getRequestMethod().method())
+                    .build();
 
     BiFunction<String, RestSpecs, RestSpecs> updateBody = (body, specs) ->
-            new RestSpecs(specs.getBaseUrl().toString(), specs.getRawEndpoint(), specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(), body, specs.getRawRequestMethod());
+            new RestSpecs()
+                    .baseURL(specs.getBaseUrl().toString())
+                    .endpoint(specs.getRawEndpoint())
+                    .headersParams(specs.getHeadersMap())
+                    .pathParams(specs.getPathParams())
+                    .queryParams(specs.getQueryParams())
+                    .body(body)
+                    .baseClient(specs.getBaseClient())
+                    .requestMethod(specs.getRequestMethod().method())
+                    .build();
 
 
     Function<Object, String> clazzToJson = object ->
@@ -48,7 +78,7 @@ public interface Helpers {
     BiFunction<HttpResponse, Class, Object> responseToClass = (response, clazz) ->
             Try.of(() -> new ObjectMapper().readValue(response.body().toString(), clazz)).getOrElse(errorMessage.get());
 
-
+    @Deprecated
     BiFunction<String, Class, Object> responseBodyToClass = (body, clazz) ->
             Try.of(() -> new ObjectMapper().readValue(body, clazz)).getOrElse(errorMessage.get());
 

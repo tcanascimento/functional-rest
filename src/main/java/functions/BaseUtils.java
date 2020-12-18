@@ -9,12 +9,14 @@ import base.RestSpecs;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
 import com.typesafe.config.ConfigFactory;
+import io.vavr.Function3;
 import io.vavr.control.Try;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
+import java.net.http.HttpClient;
 import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,6 +30,7 @@ public interface BaseUtils {
     /**
      * Works good for POJO; it was not intented to work for RestSpecs
      */
+    @Deprecated
     BiFunction<String, Class, Object> specsConfigLoaderFromFile = (file, clazz) ->
             ConfigBeanFactory.create(
                     ConfigFactory.parseFile(new File(file)).resolve().getConfig("specs"),
@@ -35,6 +38,7 @@ public interface BaseUtils {
 
     Function<String, RestSpecs> specsFromFile = file -> {
         Config config = ConfigFactory.parseFile(new File(file)).resolve();
+
         return new RestSpecs()
                 .baseURL(config.getConfig("specs").getString("baseUrl"))
                 .endpoint(config.getConfig("specs").getString("endpoint"))
@@ -45,6 +49,21 @@ public interface BaseUtils {
                 .requestMethod(config.getConfig("specs").getString("requestMethod"))
                 .build();
     };
+
+    /*
+    Function to update RestSpecs for HttpClient within SSL for https requests
+     */
+    Function3<RestSpecs, Supplier<TrustManager[]>, Function<TrustManager[], SSLContext>, RestSpecs> updateClientSpecs =
+            (specs, supplier, ssl) ->
+                new RestSpecs().baseURL(specs.getBaseUrl().toString())
+                .endpoint(specs.getRawEndpoint())
+                .headersParams(specs.getHeadersMap())
+                .queryParams(specs.getQueryParams())
+                .pathParams(specs.getPathParams())
+                .body(specs.getBody())
+                .requestMethod(specs.getRequestMethod().method())
+                .baseClient(HttpClient.newBuilder().sslContext(ssl.apply(supplier.get())).build())
+                .build();
 
     //todo: refactor
     BiFunction<String,Map<String,Object>, String> setPathParameters = (endpoint, pars) -> {
@@ -87,28 +106,15 @@ public interface BaseUtils {
                     .collect(Collectors.toMap(k -> k[0].strip(), k -> k[1].strip()));
 
 
-        /*
-    Exemplo de uso:
-        Function3<RestSpecs, Supplier<TrustManager[]>, Function<TrustManager[], SSLContext>, RestSpecs> updateClientSpecs = (specs, supplier, ssl) -> {
-        specs.setBaseClient(HttpClient.newBuilder()
-                .sslContext(ssl.apply(supplier.get()))
-                .build());
-        return specs;
-    };
+    /**
+     * Needed for Https requests. It should be used whithin HttpClient.
+     * Ex: HttpClient.newBuilder().sslContext(sslContext.apply(trustAllCerts.get())).build()
      */
-
     Supplier<TrustManager[]> trustAllCerts = () -> new TrustManager[] {
             new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-                public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                }
-                public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                }
-            }
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) { }}
     };
 
     Function<TrustManager[], SSLContext> sslContext = trustManager -> {
@@ -116,5 +122,6 @@ public interface BaseUtils {
         Try.run(() -> sc.init(null, trustManager, new java.security.SecureRandom())).get();
         return sc;
     };
+
 
 }

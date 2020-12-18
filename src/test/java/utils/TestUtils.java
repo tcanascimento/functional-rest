@@ -1,5 +1,6 @@
 package utils;
 
+import base.RestSpecs;
 import io.vavr.Lazy;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 
@@ -34,7 +35,16 @@ public interface TestUtils {
 
     Function<TestSourceTemplate,List<String>> setParams = (data) ->  Arrays.asList(data.getQueryParams().replaceAll("[^a-zA-Z0-9,]","").split(","));
 
+    //endpoint,method,statusCode
     BiFunction<ArgumentsAccessor, RestSpecs, RestSpecs> updateRestSpecs = (data, specs) ->
-        new RestSpecs(specs.getBaseUrl().toString(), data.getString(0), specs.getHeadersMap(), specs.getQueryParams(), specs.getPathParams(),"", data.getString(1));
+    new RestSpecs()
+            .baseURL(specs.getBaseUrl().toString())
+            .endpoint(data.getString(0))
+            .headersParams(specs.getHeadersMap())
+            .queryParams(specs.getQueryParams())
+            .pathParams(specs.getPathParams())
+            .body("")
+            .requestMethod(data.getString(1))
+            .build();
 
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import pojo.ResponseObject;
 import utils.MessageSupplier;
 import utils.TestUtils;
@@ -18,31 +19,11 @@ import utils.TestUtils;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static functions.RestFunctions.asyncRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @Tag("specs")
 class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions, TestUtils, MessageSupplier {
-
-/*    @Tag("builder")
-    @Test
-    void specsBuilderWithTwoParametersTest(){
-
-        var specs2 = new RestSpecsBuilder().with(
-                $ -> {
-                    $.baseUrl2 = googleBaseURL.get();
-                    $.headersParams = headers.get();
-                    $.bodyString = "";
-                    $.requestMethod = "get";
-                }).createSpecs();
-
-        assertAll("Just BaseURL and Headers from Builder",
-                () -> assertNotNull(specs2),
-                () -> assertTrue(specs2.getURI().toString().equalsIgnoreCase(googleBaseURL.get())),
-                () -> assertEquals(2, specs2.getHeaders().length));
-
-    }*/
 
     @Tag("specs-from-file")
     @Test
@@ -95,10 +76,11 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
     void specsConstructorExceptionTest() {
 
         var exceptionMsg = "you should specify a request method!"; //"baseURL cannot be empty!";
-
-        var exception = assertThrows(AssertionError.class, () -> new RestSpecs(googleBaseURL.get(), headers.get(), "", ""));
-        var exceptionFullConstructor = assertThrows(AssertionError.class, () -> new RestSpecs(
-                googleBaseURL.get(), "", headers.get(), Map.of(), Map.of(), "", ""));
+        //new RestSpecs(googleBaseURL.get(), headers.get(), "", "")
+        var exception = assertThrows(AssertionError.class, () -> new RestSpecs()
+                .baseURL(googleBaseURL.get()).headersParams(headers.get()).body("").build());
+        var exceptionFullConstructor = assertThrows(AssertionError.class, () -> new RestSpecs()
+                .baseURL(googleBaseURL.get()).headersParams(headers.get()).pathParams(Map.of()).queryParams(Map.of()).body("").build());
 
         assertAll("Raising exception for request method empty String",
                 () -> assertEquals(exceptionFullConstructor.getMessage(), exceptionMsg),
@@ -111,8 +93,9 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
     void specsBaseURLExceptionTest() {
 
         var exceptionMsg = "baseURL cannot be empty!";
-        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "", "GET");
-        var exception = assertThrows(AssertionError.class, () -> specs.setBaseUrl(""));
+//        var specs = new RestSpecs(googleBaseURL.get(), headers.get(), "", "GET");
+        var specs = new RestSpecs().baseURL(googleBaseURL.get()).headersParams(headers.get()).requestMethod("GET");
+        var exception = assertThrows(AssertionError.class, () -> specs.baseURL(""));
 
         assertAll("Raising exception for baseURL empty String",
                 () -> assertEquals(exception.getMessage(), exceptionMsg));
@@ -131,13 +114,13 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
 
         assumeTrue(response.get().statusCode() >= data.getInteger(2), statusCode200.get());
 
-        response.join().request();
+        response.get().request();
 
         var responseObject = (ResponseObject) responseToClass.apply(response.get(), ResponseObject.class);
 
         assertAll(
                 () -> assertNotNull(response.get().body(), notNull.get()),
-                () -> assertTrue(specs.getRawRequestMethod().equalsIgnoreCase(data.getString(1)), objectContentEquals.get()),
+                () -> assertTrue(specs.getRequestMethod().method().equalsIgnoreCase(data.getString(1)), objectContentEquals.get()),
                 () -> assertEquals(httpBinBaseURL.get().concat(data.getString(0)), responseObject.getUrl(), objectContentEquals.get()));
 
     }
@@ -160,12 +143,6 @@ class RestSpecsTest implements RestFunctions, Helpers, BaseUtils, HttpFunctions,
 //                .pathParams(pathParams)
                 .headersParams(headers)
                 .build();
-
-        System.out.println(specs.toString());
-        System.out.println(specs.getBaseClient());
-//        System.out.println(specs.getRawEndpoint());
-        System.out.println(specs.getUri());
-//        System.out.println(specs.getFormatedEndpoint());
 
     }
 
