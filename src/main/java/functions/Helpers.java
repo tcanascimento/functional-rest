@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.Lazy;
 import io.vavr.control.Try;
 
+import java.net.URLEncoder;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 public interface Helpers {
@@ -87,5 +90,13 @@ public interface Helpers {
         return Files.exists(path) ? path.toString() : "no dir found for " + filename;
     };
 
+    Function<Map<String, Object>, String> mapToFormParameter = map ->
+            map.entrySet()
+                    .stream()
+                    .map(i ->  new StringBuilder(URLEncoder.encode(i.getKey(), StandardCharsets.UTF_8)
+                            .concat("=")
+                            .concat(URLEncoder.encode(i.getValue().toString(), StandardCharsets.UTF_8))))
+                    .reduce((k,v) -> k.append("&").append(v))
+                    .stream().collect(Collectors.joining());
 
 }
